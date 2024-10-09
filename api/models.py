@@ -44,7 +44,33 @@ from typing import Optional
 from pydantic import BaseModel, Field, confloat, field_validator
 
 
-class BookQueryParameters(BaseModel):
+class BookBaseModel(BaseModel):
+    """
+    Class representing the base model for a book.
+
+    Validator method to ensure that ISBN numbers are exactly 13 digits.
+
+    Args:
+        cls (type): The class being validated.
+        value (str): The ISBN value being validated.
+
+    Returns:
+        str: The validated ISBN value.
+
+    Raises:
+        ValueError: If the ISBN value is not exactly 13 numeric digits.
+    """
+
+    @field_validator("isbn", check_fields=False)
+    @classmethod
+    def isbn_must_be_13_digits(cls, value):
+        if not value.isdigit() or len(value) != 13:
+            msg = "ISBN must be exactly 13 numeric digits"
+            raise ValueError(msg)
+        return value
+
+
+class BookQueryParameters(BookBaseModel):
     """
     BookQueryParameters represents the query parameters used to filter book search
     results.
@@ -68,16 +94,8 @@ class BookQueryParameters(BaseModel):
     isbn: Optional[str] = None
     return_deleted_books: bool = False
 
-    @field_validator("isbn")
-    @classmethod
-    def isbn_must_be_13_digits(cls, value):
-        if not value.isdigit() or len(value) != 13:
-            msg = "ISBN must be exactly 13 numeric digits"
-            raise ValueError(msg)
-        return value
 
-
-class AddBookQueryParameters(BaseModel):
+class AddBookQueryParameters(BookBaseModel):
     """
     AddBookQueryParameters represents the query parameters required for adding a book.
 
@@ -96,14 +114,6 @@ class AddBookQueryParameters(BaseModel):
     title: str
     category: str
     isbn: str
-
-    @field_validator("isbn")
-    @classmethod
-    def isbn_must_be_13_digits(cls, value):
-        if not value.isdigit() or len(value) != 13:
-            msg = "ISBN must be exactly 13 numeric digits"
-            raise ValueError(msg)
-        return value
 
 
 class AddRatingParameters(BaseModel):
