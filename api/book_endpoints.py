@@ -44,13 +44,23 @@ Example:
     $ python <module_name.py>
 """
 
+import re
+
 import uvicorn
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 
 import api.book_service as bs
 from api.models import AddBookQueryParameters, AddRatingParameters, BookQueryParameters
 
 app = FastAPI(title="My Books API")
+
+
+def _validate_isbn(isbn: str):
+    if not re.fullmatch(r"\d{13}", isbn):
+        raise HTTPException(
+            status_code=400, detail="Invalid ISBN. It must be 13 numeric digits."
+        )
+    return isbn
 
 
 @app.get("/books/q")
@@ -95,11 +105,15 @@ async def delete_book(isbn: str):
 
 
 @app.post("/books/{isbn}/ratings")
-async def add_rating(isbn: str, params: AddRatingParameters = Depends()):
+async def add_rating(
+    isbn: str = Depends(_validate_isbn), params: AddRatingParameters = Depends()
+):
     """
     Args:
-        isbn: The International Standard Book Number (ISBN) for the book.
-        params: An object of type AddRatingParameters containing rating details.
+        isbn: The ISBN of the book to which the rating should be added. This parameter
+        is validated using the _validate_isbn dependency.
+        params: A set of parameters required to add the rating. This is provided by the
+        AddRatingParameters dependency.
     """
     return await bs.add_rating(isbn, params)
 
