@@ -41,39 +41,29 @@ Example usage:
 
 from typing import Optional
 
+from fastapi.params import Depends
 from pydantic import BaseModel, Field, confloat, field_validator
 
 import api.validators as validators
 
 
-class BookBaseModel(BaseModel):
+class BookQueryParameters(BaseModel):
     """
-    BookBaseModel is a subclass of BaseModel that adds validation constraints for
-    certain book-related fields.
+    BookQueryParameters Model
 
-    Methods:
-        isbn_must_be_13_digits(cls, value): Validates that the 'isbn' field
-        contains exactly 13 digits.
-    """
-
-    @field_validator("isbn", check_fields=False)
-    @classmethod
-    def isbn_must_be_13_digits(cls, value):
-        validators.validate_isbn(value)
-
-
-class BookQueryParameters(BookBaseModel):
-    """
-    BookQueryParameters represents the query parameters used to filter book search
-    results.
+    Represents query parameters for querying book records.
 
     Attributes:
-        author: An optional string to filter books by their author.
-        category: An optional string to filter books by their category.
-        top: An optional integer to limit the number of books returned.
-        isbn: An optional string to filter books by their ISBN.
-        return_deleted_books: A boolean that indicates whether to include deleted
-        books in the search results. Defaults to False.
+        author (Optional[str]): The author of the book.
+        category (Optional[str]): The category or genre of the book.
+        top (Optional[int]): The top N records to return.
+        isbn (Optional[str]): The ISBN number of the book.
+        return_deleted_books (bool): Flag to include deleted books in the query.
+        Defaults to False.
+
+    Methods:
+        isbn_must_be_13_digits(cls, value):
+            Validates that the ISBN is exactly 13 digits long if provided.
     """
 
     author: Optional[str] = None
@@ -82,8 +72,17 @@ class BookQueryParameters(BookBaseModel):
     isbn: Optional[str] = None
     return_deleted_books: bool = False
 
+    @field_validator("isbn", check_fields=False)
+    @classmethod
+    def isbn_must_be_13_digits(cls, value):
+        if not value:
+            return None
 
-class AddBookQueryParameters(BookBaseModel):
+        validators.validate_isbn(value)
+        return value
+
+
+class AddBookQueryParameters(BaseModel):
     """
     AddBookQueryParameters represents the query parameters required for adding a book.
 
@@ -97,7 +96,7 @@ class AddBookQueryParameters(BookBaseModel):
     author: str
     title: str
     category: str
-    isbn: str
+    isbn: str = Depends(validators.validate_isbn)
 
 
 class AddRatingParameters(BaseModel):
