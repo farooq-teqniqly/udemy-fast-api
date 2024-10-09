@@ -1,46 +1,55 @@
 """
-This module defines a FastAPI application for querying, adding, and deleting books.
+book_service.py
 
-It includes the following components:
-- FastAPI application setup with a specified title.
-- API endpoints to query, add, and delete books using specified parameters.
-- Dependency injection to handle book query, addition, and deletion parameters.
+This module provides the core services for managing book-related operations.
+It includes functions for querying, adding, deleting books, and managing
+book ratings and reviews. Additionally, it contains utility functions for
+filtering and managing book data.
 
-Main Components:
-- FastAPI: The web framework used to create the API application.
-- uvicorn: ASGI server used to run the application.
-- api.book_service: Module containing the business logic for querying, adding, and
-    deleting books.
-- api.models: Module defining the data models used in the API.
+Functions:
+    _filter_books(books, filter_params):
+        Applies various filtering criteria to a list of books based on
+        provided parameters.
 
-Endpoints:
-- GET /books/q:
-    - Description: API endpoint to query books based on specified parameters.
-    - Parameters: BookQueryParameters (Injected via Depends).
-    - Returns: The result of the book query.
-- POST /books:
-    - Description: API endpoint to add a new book based on specified parameters.
-    - Parameters: AddBookQueryParameters (Injected via Depends).
-    - Returns: JSON response indicating the success or failure of the add book
-        operation.
-- DELETE /books/{isbn}:
-    - Description: API endpoint to delete a book identified by its ISBN.
-    - Parameters: ISBN of the book to be deleted.
-    - Returns: JSON response indicating the success or failure of the delete book
-        operation.
+    _limit_books(books, limit):
+        Limits the number of books returned based on the specified limit.
 
-Usage:
-To run the application, execute this module directly. The application will be available
-at host 127.0.0.1 on port 8000.
+    _exclude_deleted_books(books):
+        Excludes books marked as deleted from the provided list.
 
-Example:
-    $ python <module_name.py>
+    _get_author_last_name(author):
+        Retrieves the last name of an author from the author metadata.
+
+    query_book(query_params):
+        Queries books based on given parameters. Supports searching and
+        filtering of book data.
+
+    add_book(book_data):
+        Adds a new book to the collection. Requires book details such as title,
+        author, published date, etc.
+
+    delete_book(book_id):
+        Marks a book as deleted based on the provided book ID.
+
+    add_rating(book_id, rating_data):
+        Adds a rating to a specific book. Requires book ID and rating details.
+
+    add_review(book_id, review_data):
+        Adds a review to a specific book. Requires book ID and review details.
+
+    get_reviews(book_id):
+        Retrieves reviews for a specific book based on the book ID.
 """
 
 from typing import Dict, List, Optional
 
-from api.data import BOOKS
-from api.models import AddBookQueryParameters, AddRatingParameters, BookQueryParameters
+from api.data import BOOK_REVIEWS, BOOKS
+from api.models import (
+    AddBookQueryParameters,
+    AddRatingParameters,
+    AddReviewRequest,
+    BookQueryParameters,
+)
 
 
 def _filter_books(
@@ -133,3 +142,29 @@ async def add_rating(isbn: str, params: AddRatingParameters):
     book["num_ratings"] += 1
     book["sum_ratings"] += params.rating
     book["avg_rating"] = book["sum_ratings"] / book["num_ratings"]
+
+
+async def add_review(isbn: str, request: AddReviewRequest):
+    """
+    Args:
+        isbn: The International Standard Book Number of the book.
+        request: An instance of AddReviewRequest containing the review to be added.
+    """
+    book_reviews = BOOK_REVIEWS.setdefault(isbn, [])
+
+    if not any(book for book in BOOKS if book["isbn"] == isbn):
+        return
+
+    book_reviews.append(request.review)
+
+
+async def get_reviews(isbn: str):
+    """
+    Args:
+        isbn (str): The ISBN number of the book for which reviews are to be fetched.
+
+    Returns:
+        list: A list containing reviews for the book. If no reviews are found, an empty
+        list is returned.
+    """
+    return BOOK_REVIEWS.get(isbn, [])

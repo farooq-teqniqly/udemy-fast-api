@@ -1,42 +1,66 @@
 """
-Book Query Parameters Module
+models.py
 
-This module provides the definition of the `BookQueryParameters`,
-    `AddBookQueryParameters`, and `AddRatingParameters` classes, which are used to
-    represent the query parameters for filtering, paginating, adding book search
-    results, and adding ratings for books.
+This module provides the definition of various Pydantic models used for handling
+query parameters and request bodies in the book-related endpoints of the application.
+These models ensure data validation and structured representation of request parameters.
 
 Classes:
-    BookQueryParameters: A Pydantic model that includes optional attributes such as
-    author, category, top, and ISBN to filter book search results.
-    AddBookQueryParameters: A Pydantic model that includes mandatory attributes such as
-    author, title, category, and ISBN to add a new book.
-    AddRatingParameters: A Pydantic model that includes an attribute for the rating to
-    be added.
+    BookQueryParameters:
+        A Pydantic model representing query parameters for filtering and paginating
+        book search results. Includes attributes such as author, category, top,
+        ISBN, and a flag to include deleted books.
+
+    AddBookQueryParameters:
+        A Pydantic model representing the mandatory parameters required for adding
+        a new book. Includes attributes such as author, title, category, and ISBN.
+
+    AddRatingParameters:
+        A Pydantic model representing the parameters required for adding a rating
+        to a book. Ensures that the rating value is within the specified range of
+        1.0 to 5.0.
+
+    AddReviewRequest:
+        A Pydantic model representing the request to add a review. Includes the
+        review content.
 
 Example usage:
     Creating a query parameter instance for book search:
 
+    ```python
     query_params = BookQueryParameters(
         author="J.K. Rowling",
         category="Fantasy",
         top=10)
     print(query_params.dict())
+    ```
 
     Creating a parameter instance for adding a new book:
 
+    ```python
     add_params = AddBookQueryParameters(
         author="J.K. Rowling",
         title="New Book",
         category="Fantasy",
-        isbn="1234567890")
+        isbn="1234567890123")
     print(add_params.dict())
+    ```
 
     Creating a parameter instance for adding a rating:
 
+    ```python
     rating_params = AddRatingParameters(
         rating=4.5)
     print(rating_params.dict())
+    ```
+
+    Creating a parameter instance for adding a review:
+
+    ```python
+    review_params = AddReviewRequest(
+        review="Great book!")
+    print(review_params.dict())
+    ```
 """
 
 from typing import Optional
@@ -113,3 +137,14 @@ class AddRatingParameters(BaseModel):
     rating: confloat(ge=1.0, le=5.0) = Field(
         description="Rating must be between 1 and 5."
     )
+
+
+class AddReviewRequest(BaseModel):
+    """
+    AddReviewRequest is a data model representing the request to add a review.
+
+    Attributes:
+        review (str): The content of the review.
+    """
+
+    review: str
