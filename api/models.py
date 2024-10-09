@@ -21,15 +21,13 @@ from pydantic import BaseModel
 
 class BookQueryParameters(BaseModel):
     """
-
-    Represents query parameters for filtering and paginating book search results.
+    BookQueryParameters is a model for specifying query parameters related to books.
 
     Attributes:
-        author (Optional[str]): The author of the book to filter by.
-        category (Optional[str]): The category or genre of the book to filter by.
-        top (Optional[int]): The number of top results to return.
-        isbn (Optional[str]): The International Standard Book Number (ISBN) to
-        filter by.
+        author (Optional[str]): The name of the author to query.
+        category (Optional[str]): The category or genre of the book to query.
+        top (Optional[int]): The number of top records to retrieve.
+        isbn (Optional[str]): The ISBN number of the book to query.
     """
 
     author: Optional[str] = None
