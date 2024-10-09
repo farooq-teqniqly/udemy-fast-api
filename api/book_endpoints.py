@@ -44,23 +44,14 @@ Example:
     $ python <module_name.py>
 """
 
-import re
-
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI
 
 import api.book_service as bs
+import api.validators as validators
 from api.models import AddBookQueryParameters, AddRatingParameters, BookQueryParameters
 
 app = FastAPI(title="My Books API")
-
-
-def _validate_isbn(isbn: str):
-    if not re.fullmatch(r"\d{13}", isbn):
-        raise HTTPException(
-            status_code=400, detail="Invalid ISBN. It must be 13 numeric digits."
-        )
-    return isbn
 
 
 @app.get("/books/q")
@@ -91,22 +82,23 @@ async def add_book(params: AddBookQueryParameters = Depends()):
 
 
 @app.delete("/books/{isbn}")
-async def delete_book(isbn: str):
+async def delete_book(isbn: str = Depends(validators.validate_isbn)):
     """
-    Deletes a book from the collection.
-
     Args:
         isbn: The International Standard Book Number (ISBN) of the book to be deleted.
+        It is validated using the `validate_isbn` function.
 
     Returns:
-        The result of the delete operation.
+        The result of the book deletion operation, which could include confirmation of
+        deletion or an error message if the book could not be deleted.
     """
     return await bs.delete_book(isbn)
 
 
 @app.post("/books/{isbn}/ratings")
 async def add_rating(
-    isbn: str = Depends(_validate_isbn), params: AddRatingParameters = Depends()
+    isbn: str = Depends(validators.validate_isbn),
+    params: AddRatingParameters = Depends(),
 ):
     """
     Args:

@@ -43,31 +43,23 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, confloat, field_validator
 
+import api.validators as validators
+
 
 class BookBaseModel(BaseModel):
     """
-    Class representing the base model for a book.
+    BookBaseModel is a subclass of BaseModel that adds validation constraints for
+    certain book-related fields.
 
-    Validator method to ensure that ISBN numbers are exactly 13 digits.
-
-    Args:
-        cls (type): The class being validated.
-        value (str): The ISBN value being validated.
-
-    Returns:
-        str: The validated ISBN value.
-
-    Raises:
-        ValueError: If the ISBN value is not exactly 13 numeric digits.
+    Methods:
+        isbn_must_be_13_digits(cls, value): Validates that the 'isbn' field
+        contains exactly 13 digits.
     """
 
     @field_validator("isbn", check_fields=False)
     @classmethod
     def isbn_must_be_13_digits(cls, value):
-        if not value.isdigit() or len(value) != 13:
-            msg = "ISBN must be exactly 13 numeric digits"
-            raise ValueError(msg)
-        return value
+        validators.validate_isbn(value)
 
 
 class BookQueryParameters(BookBaseModel):
@@ -82,10 +74,6 @@ class BookQueryParameters(BookBaseModel):
         isbn: An optional string to filter books by their ISBN.
         return_deleted_books: A boolean that indicates whether to include deleted
         books in the search results. Defaults to False.
-
-    Methods:
-        isbn_must_be_13_digits: Validates that the provided ISBN is exactly 13
-        numeric digits.
     """
 
     author: Optional[str] = None
@@ -104,10 +92,6 @@ class AddBookQueryParameters(BookBaseModel):
         title (str): The title of the book.
         category (str): The category or genre of the book.
         isbn (str): The ISBN number of the book, must be exactly 13 numeric digits.
-
-    Methods:
-        isbn_must_be_13_digits (classmethod): Validates that the ISBN number is exactly
-        13 numeric digits.
     """
 
     author: str
