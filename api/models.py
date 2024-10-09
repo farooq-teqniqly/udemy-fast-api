@@ -41,20 +41,25 @@ Example usage:
 
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, confloat, field_validator
 
 
 class BookQueryParameters(BaseModel):
     """
-    BookQueryParameters is a model for specifying query parameters related to books.
+    BookQueryParameters represents the query parameters used to filter book search
+    results.
 
     Attributes:
-        author (Optional[str]): The name of the author to query.
-        category (Optional[str]): The category or genre of the book to query.
-        top (Optional[int]): The number of top records to retrieve.
-        isbn (Optional[str]): The ISBN number of the book to query.
-        return_deleted_books (bool): False returns only non-deleted books, otherwise
-        all books are returned.
+        author: An optional string to filter books by their author.
+        category: An optional string to filter books by their category.
+        top: An optional integer to limit the number of books returned.
+        isbn: An optional string to filter books by their ISBN.
+        return_deleted_books: A boolean that indicates whether to include deleted
+        books in the search results. Defaults to False.
+
+    Methods:
+        isbn_must_be_13_digits: Validates that the provided ISBN is exactly 13
+        numeric digits.
     """
 
     author: Optional[str] = None
@@ -63,16 +68,28 @@ class BookQueryParameters(BaseModel):
     isbn: Optional[str] = None
     return_deleted_books: bool = False
 
+    @field_validator("isbn")
+    @classmethod
+    def isbn_must_be_13_digits(cls, value):
+        if not value.isdigit() or len(value) != 13:
+            msg = "ISBN must be exactly 13 numeric digits"
+            raise ValueError(msg)
+        return value
+
 
 class AddBookQueryParameters(BaseModel):
     """
-    Represents the query parameters for adding a book to the system.
+    AddBookQueryParameters represents the query parameters required for adding a book.
 
     Attributes:
         author (str): The author of the book.
         title (str): The title of the book.
         category (str): The category or genre of the book.
-        isbn (str): The International Standard Book Number of the book.
+        isbn (str): The ISBN number of the book, must be exactly 13 numeric digits.
+
+    Methods:
+        isbn_must_be_13_digits (classmethod): Validates that the ISBN number is exactly
+        13 numeric digits.
     """
 
     author: str
@@ -80,14 +97,26 @@ class AddBookQueryParameters(BaseModel):
     category: str
     isbn: str
 
+    @field_validator("isbn")
+    @classmethod
+    def isbn_must_be_13_digits(cls, value):
+        if not value.isdigit() or len(value) != 13:
+            msg = "ISBN must be exactly 13 numeric digits"
+            raise ValueError(msg)
+        return value
+
 
 class AddRatingParameters(BaseModel):
     """
-    AddRatingParameters is a model used to hold the parameters required for adding a
-    rating.
+    Represents the parameters required to add a rating.
+    This class is responsible for validating that the
+    rating value is within the specified range of 1.0 to 5.0.
 
     Attributes:
-        rating (float): The rating value to be added.
+        rating: A floating-point number for the rating, constrained
+                to be between 1.0 and 5.0 inclusive.
     """
 
-    rating: float
+    rating: confloat(ge=1.0, le=5.0) = Field(
+        description="Rating must be between 1 and 5."
+    )
