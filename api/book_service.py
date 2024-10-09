@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 
 from api.data import BOOKS
+from api.models import BookQueryParameters
 
 
 def _filter_books(
@@ -19,13 +20,8 @@ def _limit_books(
     return books[:limit] if limit else books
 
 
-async def query_book(
-    author: Optional[str] = None,
-    category: Optional[str] = None,
-    top: Optional[int] = None,
-    isbn: Optional[str] = None,
-) -> List[Dict[str, Optional[str]]]:
-    filtered_books = _filter_books(BOOKS, "author", author)
-    filtered_books = _filter_books(filtered_books, "category", category)
-    filtered_books = _filter_books(filtered_books, "isbn", isbn)
-    return _limit_books(filtered_books, top)
+async def query_book(params: BookQueryParameters) -> List[Dict[str, Optional[str]]]:
+    filtered_books = _filter_books(BOOKS, "author", params.author)
+    filtered_books = _filter_books(filtered_books, "category", params.category)
+    filtered_books = _filter_books(filtered_books, "isbn", params.isbn)
+    return _limit_books(filtered_books, params.top)
