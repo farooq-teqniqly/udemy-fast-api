@@ -1,27 +1,40 @@
 """
-This module provides functionality for querying books from a predefined list of books.
-It includes helper functions to filter and limit the books based on various criteria
-such as author, category, and ISBN.
+This module defines a FastAPI application for querying and adding books.
 
-Functions:
-    _filter_books(books, key, value): Filters the list of books based on a given key
-    and value.
-    _limit_books(books, limit): Limits the number of books returned.
-    query_book(params): Asynchronously queries books based on given query parameters.
+It includes the following components:
+- FastAPI application setup with a specified title.
+- API endpoints to query and add books using specified parameters.
+- Dependency injection to handle book query and addition parameters.
 
-The `query_book` function can be used to perform complex queries on the list of books by
-combining multiple filter criteria and limiting the results.
+Main Components:
+- FastAPI: The web framework used to create the API application.
+- uvicorn: ASGI server used to run the application.
+- api.book_service: Module containing the business logic for querying and adding books.
+- api.models: Module defining the data models used in the API.
 
-Dependencies:
-    - api.data.BOOKS: A predefined list of books.
-    - api.models.BookQueryParameters: A dataclass defining the parameters for querying
-    books.
+Endpoints:
+- GET /books/q:
+    - Description: API endpoint to query books based on specified parameters.
+    - Parameters: BookQueryParameters (Injected via Depends).
+    - Returns: The result of the book query.
+- POST /books:
+    - Description: API endpoint to add a new book based on specified parameters.
+    - Parameters: AddBookQueryParameters (Injected via Depends).
+    - Returns: JSON response indicating the success or failure of the add book
+    operation.
+
+Usage:
+To run the application, execute this module directly. The application will be available
+at host 127.0.0.1 on port 8000.
+
+Example:
+    $ python <module_name.py>
 """
 
 from typing import Dict, List, Optional
 
 from api.data import BOOKS
-from api.models import BookQueryParameters
+from api.models import AddBookQueryParameters, BookQueryParameters
 
 
 def _filter_books(
@@ -40,6 +53,10 @@ def _limit_books(
     return books[:limit] if limit else books
 
 
+def _get_author_last_name(name: str) -> str:
+    return name.split()[-1]
+
+
 async def query_book(params: BookQueryParameters) -> List[Dict[str, Optional[str]]]:
     """
     Args:
@@ -53,4 +70,26 @@ async def query_book(params: BookQueryParameters) -> List[Dict[str, Optional[str
     filtered_books = _filter_books(BOOKS, "author", params.author)
     filtered_books = _filter_books(filtered_books, "category", params.category)
     filtered_books = _filter_books(filtered_books, "isbn", params.isbn)
-    return _limit_books(filtered_books, params.top)
+    filtered_books = _limit_books(filtered_books, params.top)
+    filtered_books.sort(key=lambda b: _get_author_last_name(b["author"]))
+    return filtered_books
+
+
+async def add_book(params: AddBookQueryParameters) -> None:
+    """
+    Adds a book to the BOOKS list.
+
+    Args:
+        params: Contains the attributes of the book to add including title, author,
+        category, and ISBN.
+    """
+    BOOKS.append(
+        dict(
+            title=params.title,
+            author=params.author,
+            category=params.category,
+            isbn=params.isbn,
+            avg_rating=None,
+            num_ratings=None,
+        )
+    )

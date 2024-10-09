@@ -14,14 +14,6 @@ Attributes:
         - isbn (str): The ISBN number of the book.
         - avg_rating (float): The average rating of the book.
         - num_ratings (int): The total number of ratings the book has received.
-
-Functions:
-    _get_author_last_name(name: str) -> str: Returns the last name of the author from a
-    full name string.
-
-Usage:
-    The BOOKS list gets automatically sorted by the author's last name upon module
-    import.
 """
 
 BOOKS = [
@@ -42,7 +34,12 @@ BOOKS = [
         num_ratings=None,
     ),
     dict(
-        title="1984", author="George Orwell", category="Dystopian", isbn="9780451524935"
+        title="1984",
+        author="George Orwell",
+        category="Dystopian",
+        isbn="9780451524935",
+        avg_rating=None,
+        num_ratings=None,
     ),
     dict(
         title="Animal Farm",
@@ -77,10 +74,3 @@ BOOKS = [
         num_ratings=None,
     ),
 ]
-
-
-def _get_author_last_name(name: str) -> str:
-    return name.split()[-1]
-
-
-BOOKS.sort(key=lambda b: _get_author_last_name(b["author"]))
