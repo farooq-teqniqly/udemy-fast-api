@@ -15,6 +15,12 @@ BOOKS = [
         title="1984", author="George Orwell", category="Dystopian", isbn="9780451524935"
     ),
     dict(
+        title="Animal Farm",
+        author="George Orwell",
+        category="Satire",
+        isbn="9780451526342",
+    ),
+    dict(
         title="To Kill a Mockingbird",
         author="Harper Lee",
         category="Classic",
@@ -33,3 +39,10 @@ BOOKS = [
         isbn="9780062409850",
     ),
 ]
+
+
+def _get_author_last_name(name: str) -> str:
+    return name.split()[-1]
+
+
+BOOKS.sort(key=lambda b: _get_author_last_name(b["author"]))
