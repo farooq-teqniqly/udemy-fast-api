@@ -14,6 +14,7 @@ Attributes:
         - isbn (str): The ISBN number of the book.
         - avg_rating (float): The average rating of the book.
         - num_ratings (int): The total number of ratings the book has received.
+        - soft_deleted (bool): True if the book is soft-deleted, otherwise False.
 """
 
 BOOKS = [
@@ -24,6 +25,7 @@ BOOKS = [
         isbn="9780553380163",
         avg_rating=None,
         num_ratings=None,
+        soft_deleted=False,
     ),
     dict(
         title="The Great Gatsby",
@@ -32,6 +34,7 @@ BOOKS = [
         isbn="9780743273565",
         avg_rating=None,
         num_ratings=None,
+        soft_deleted=False,
     ),
     dict(
         title="1984",
@@ -40,6 +43,7 @@ BOOKS = [
         isbn="9780451524935",
         avg_rating=None,
         num_ratings=None,
+        soft_deleted=False,
     ),
     dict(
         title="Animal Farm",
@@ -48,6 +52,7 @@ BOOKS = [
         isbn="9780451526342",
         avg_rating=None,
         num_ratings=None,
+        soft_deleted=False,
     ),
     dict(
         title="To Kill a Mockingbird",
@@ -56,6 +61,7 @@ BOOKS = [
         isbn="9780061120084",
         avg_rating=None,
         num_ratings=None,
+        soft_deleted=False,
     ),
     dict(
         title="The Catcher in the Rye",
@@ -64,6 +70,7 @@ BOOKS = [
         isbn="9780316769488",
         avg_rating=None,
         num_ratings=None,
+        soft_deleted=False,
     ),
     dict(
         title="Go Set a Watchman",
@@ -72,5 +79,6 @@ BOOKS = [
         isbn="9780062409850",
         avg_rating=None,
         num_ratings=None,
+        soft_deleted=False,
     ),
 ]

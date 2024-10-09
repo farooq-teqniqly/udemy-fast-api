@@ -44,15 +44,28 @@ class BookQueryParameters(BaseModel):
         category (Optional[str]): The category or genre of the book to query.
         top (Optional[int]): The number of top records to retrieve.
         isbn (Optional[str]): The ISBN number of the book to query.
+        return_deleted_books (bool): False returns only non-deleted books, otherwise
+        all books are returned.
     """
 
     author: Optional[str] = None
     category: Optional[str] = None
     top: Optional[int] = None
     isbn: Optional[str] = None
+    return_deleted_books: bool = False
 
 
 class AddBookQueryParameters(BaseModel):
+    """
+    Represents the query parameters for adding a book to the system.
+
+    Attributes:
+        author (str): The author of the book.
+        title (str): The title of the book.
+        category (str): The category or genre of the book.
+        isbn (str): The International Standard Book Number of the book.
+    """
+
     author: str
     title: str
     category: str

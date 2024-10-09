@@ -1,15 +1,16 @@
 """
-This module defines a FastAPI application for querying and adding books.
+This module defines a FastAPI application for querying, adding, and deleting books.
 
 It includes the following components:
 - FastAPI application setup with a specified title.
-- API endpoints to query and add books using specified parameters.
-- Dependency injection to handle book query and addition parameters.
+- API endpoints to query, add, and delete books using specified parameters.
+- Dependency injection to handle book query, addition, and deletion parameters.
 
 Main Components:
 - FastAPI: The web framework used to create the API application.
 - uvicorn: ASGI server used to run the application.
-- api.book_service: Module containing the business logic for querying and adding books.
+- api.book_service: Module containing the business logic for querying, adding, and
+    deleting books.
 - api.models: Module defining the data models used in the API.
 
 Endpoints:
@@ -21,7 +22,12 @@ Endpoints:
     - Description: API endpoint to add a new book based on specified parameters.
     - Parameters: AddBookQueryParameters (Injected via Depends).
     - Returns: JSON response indicating the success or failure of the add book
-    operation.
+        operation.
+- DELETE /books/{isbn}:
+    - Description: API endpoint to delete a book identified by its ISBN.
+    - Parameters: ISBN of the book to be deleted.
+    - Returns: JSON response indicating the success or failure of the delete book
+        operation.
 
 Usage:
 To run the application, execute this module directly. The application will be available
@@ -53,6 +59,10 @@ def _limit_books(
     return books[:limit] if limit else books
 
 
+def _exclude_deleted_books(books: List[Dict[str, Optional[str]]]):
+    return [book for book in books if not book.get("soft_deleted", False)]
+
+
 def _get_author_last_name(name: str) -> str:
     return name.split()[-1]
 
@@ -70,6 +80,10 @@ async def query_book(params: BookQueryParameters) -> List[Dict[str, Optional[str
     filtered_books = _filter_books(BOOKS, "author", params.author)
     filtered_books = _filter_books(filtered_books, "category", params.category)
     filtered_books = _filter_books(filtered_books, "isbn", params.isbn)
+
+    if not params.return_deleted_books:
+        filtered_books = _exclude_deleted_books(filtered_books)
+
     filtered_books = _limit_books(filtered_books, params.top)
     filtered_books.sort(key=lambda b: _get_author_last_name(b["author"]))
     return filtered_books
@@ -93,3 +107,17 @@ async def add_book(params: AddBookQueryParameters) -> None:
             num_ratings=None,
         )
     )
+
+
+async def delete_book(isbn: str) -> None:
+    """
+    Args:
+        isbn: The ISBN of the book to be deleted.
+
+    Marks the book identified by the provided ISBN as 'soft deleted' in the BOOKS
+    collection.
+    """
+    books = [b for b in BOOKS if b["isbn"] == isbn]
+
+    if books:
+        books[0]["soft_deleted"] = True
