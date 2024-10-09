@@ -40,7 +40,7 @@ Example:
 from typing import Dict, List, Optional
 
 from api.data import BOOKS
-from api.models import AddBookQueryParameters, BookQueryParameters
+from api.models import AddBookQueryParameters, AddRatingParameters, BookQueryParameters
 
 
 def _filter_books(
@@ -121,3 +121,15 @@ async def delete_book(isbn: str) -> None:
 
     if books:
         books[0]["soft_deleted"] = True
+
+
+async def add_rating(isbn: str, params: AddRatingParameters):
+    books = [b for b in BOOKS if b["isbn"] == isbn]
+
+    if len(books) == 0:
+        return
+
+    book = books[0]
+    book["num_ratings"] += 1
+    book["sum_ratings"] += params.rating
+    book["avg_rating"] = book["sum_ratings"] / book["num_ratings"]

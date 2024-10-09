@@ -1,15 +1,18 @@
 """
 Book Query Parameters Module
 
-This module provides the definition of the `BookQueryParameters` and
-`AddBookQueryParameters` classes, which are used to represent the query parameters for
-filtering, paginating, and adding book search results.
+This module provides the definition of the `BookQueryParameters`,
+    `AddBookQueryParameters`, and `AddRatingParameters` classes, which are used to
+    represent the query parameters for filtering, paginating, adding book search
+    results, and adding ratings for books.
 
 Classes:
     BookQueryParameters: A Pydantic model that includes optional attributes such as
     author, category, top, and ISBN to filter book search results.
     AddBookQueryParameters: A Pydantic model that includes mandatory attributes such as
     author, title, category, and ISBN to add a new book.
+    AddRatingParameters: A Pydantic model that includes an attribute for the rating to
+    be added.
 
 Example usage:
     Creating a query parameter instance for book search:
@@ -28,6 +31,12 @@ Example usage:
         category="Fantasy",
         isbn="1234567890")
     print(add_params.dict())
+
+    Creating a parameter instance for adding a rating:
+
+    rating_params = AddRatingParameters(
+        rating=4.5)
+    print(rating_params.dict())
 """
 
 from typing import Optional
@@ -70,3 +79,15 @@ class AddBookQueryParameters(BaseModel):
     title: str
     category: str
     isbn: str
+
+
+class AddRatingParameters(BaseModel):
+    """
+    AddRatingParameters is a model used to hold the parameters required for adding a
+    rating.
+
+    Attributes:
+        rating (float): The rating value to be added.
+    """
+
+    rating: float
