@@ -98,14 +98,14 @@ async def delete_book(isbn: str = Depends(validators.validate_isbn)):
 @app.post("/books/{isbn}/ratings")
 async def add_rating(
     isbn: str = Depends(validators.validate_isbn),
-    params: AddRatingParameters = Depends(),
+    params: AddRatingParameters = Body(),
 ):
     """
     Args:
-        isbn: The ISBN of the book to which the rating should be added. This parameter
-        is validated using the _validate_isbn dependency.
-        params: A set of parameters required to add the rating. This is provided by the
-        AddRatingParameters dependency.
+        isbn: The ISBN of the book for which the rating is being added. Validated by
+        `validators.validate_isbn`.
+        params: The parameters for the rating being added, encapsulated in
+        `AddRatingParameters` and passed in the request body.
     """
     return await bs.add_rating(isbn, params)
 
