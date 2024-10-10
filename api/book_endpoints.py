@@ -66,7 +66,7 @@ async def query_book(params: BookQueryParameters = Depends()):
 
 
 @app.post("/books")
-async def add_book(params: CreateBookRequest = Body()):
+async def create_book(params: CreateBookRequest = Body()):
     """
     Args:
         params: Query parameters for adding a book. Expected to be an instance of
@@ -108,7 +108,7 @@ async def add_rating(
 
 
 @app.post("/books/{isbn}/reviews")
-async def add_review(
+async def create_review(
     isbn: str = Depends(validators.validate_isbn), request: CreateReviewRequest = Body()
 ):
     """
