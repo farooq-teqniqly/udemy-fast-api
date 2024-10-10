@@ -11,7 +11,7 @@ Classes:
         book search results. Includes attributes such as author, category, top,
         ISBN, and a flag to include deleted books.
 
-    AddBookQueryParameters:
+    CreateBookRequest:
         A Pydantic model representing the mandatory parameters required for adding
         a new book. Includes attributes such as author, title, category, and ISBN.
 
@@ -38,7 +38,7 @@ Example usage:
     Creating a parameter instance for adding a new book:
 
     ```python
-    add_params = AddBookQueryParameters(
+    add_params = CreateBookRequest(
         author="J.K. Rowling",
         title="New Book",
         category="Fantasy",
@@ -106,9 +106,9 @@ class BookQueryParameters(BaseModel):
         return value
 
 
-class AddBookQueryParameters(BaseModel):
+class CreateBookRequest(BaseModel):
     """
-    AddBookQueryParameters represents the query parameters required for adding a book.
+    CreateBookRequest is a data model representing the request to add a book.
 
     Attributes:
         author (str): The author of the book.

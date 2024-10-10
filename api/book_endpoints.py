@@ -42,9 +42,9 @@ from fastapi import Body, Depends, FastAPI
 import api.book_service as bs
 import api.validators as validators
 from api.models import (
-    AddBookQueryParameters,
     AddRatingParameters,
     BookQueryParameters,
+    CreateBookRequest,
     CreateReviewRequest,
 )
 
@@ -66,11 +66,11 @@ async def query_book(params: BookQueryParameters = Depends()):
 
 
 @app.post("/books")
-async def add_book(params: AddBookQueryParameters = Depends()):
+async def add_book(params: CreateBookRequest = Depends()):
     """
     Args:
         params: Query parameters for adding a book. Expected to be an instance of
-        AddBookQueryParameters.
+        CreateBookRequest.
 
     Returns:
         JSON response indicating the success or failure of the add book operation.

@@ -45,9 +45,9 @@ from typing import Dict, List, Optional
 
 from api.data import BOOK_REVIEWS, BOOKS
 from api.models import (
-    AddBookQueryParameters,
     AddRatingParameters,
     BookQueryParameters,
+    CreateBookRequest,
     CreateReviewRequest,
 )
 
@@ -98,7 +98,7 @@ async def query_book(params: BookQueryParameters) -> List[Dict[str, Optional[str
     return filtered_books
 
 
-async def add_book(params: AddBookQueryParameters) -> None:
+async def add_book(params: CreateBookRequest) -> None:
     """
     Adds a book to the BOOKS list.
 
