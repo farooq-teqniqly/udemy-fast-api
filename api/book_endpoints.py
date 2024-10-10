@@ -1,39 +1,42 @@
 """
 book_endpoints.py
 
-This module defines the endpoints for managing book-related operations
-within the application. It leverages FastAPI to register routes for CRUD
-operations related to books, handling ratings, and managing reviews.
+This module defines the endpoints for managing book-related operations within
+the application. It leverages FastAPI to register routes for CRUD operations
+related to books, handling ratings, and managing reviews.
 
 Attributes:
-    bs: An instance of book services used to handle various book-related operations.
-    validators: A module containing validators for input data.
-    app: The FastAPI application instance to which all the endpoints are registered.
+    bs (BookService): An instance of the book services used to handle various
+    book-related operations.
+    validators (module): A module containing validators for input data.
+    app (FastAPI): The FastAPI application instance to which all the endpoints are
+    registered.
 
 Functions:
-    query_book(request):
+    query_book(request: QueryBookRequest) -> List[Book]:
         Handles GET requests to fetch details of a specific book or a list of books
-        based on provided query parameters.
+        based on provided query parameters. Uses book service for querying.
 
-    add_book(request):
+    create_book(request: CreateBookRequest) -> Book:
         Handles POST requests to add a new book to the collection. Takes in various
-        book details as input.
+        book details as input and uses the book service to create the book.
 
-    delete_book(request):
+    delete_book(book_id: int) -> None:
         Handles DELETE requests to remove a book from the collection based on the
-        book ID provided.
+        book ID provided. Uses the book service to perform the deletion.
 
-    add_rating(request):
+    add_rating(book_id: int, request: AddRatingRequest) -> None:
         Handles POST requests to add a rating to a specific book. The rating details
-        are provided in the request.
+        are provided in the request, and it uses the book service to add the rating.
 
-    add_review(request):
+    create_review(book_id: int, request: CreateReview) -> None:
         Handles POST requests to add a review for a specific book. Review details
-        are provided in the request.
+        are provided in the request, and it uses the book service to add the review.
 
-    get_reviews(request):
+    get_reviews(book_id: int) -> List[Review]:
         Handles GET requests to fetch reviews of a specific book. The book ID is
-        provided in the query parameters.
+        provided in the query parameters, and it uses the book service to retrieve the
+        reviews.
 """
 
 import uvicorn
@@ -69,13 +72,13 @@ async def query_book(params: BookQueryParameters = Depends()):
 async def create_book(params: CreateBookRequest = Body()):
     """
     Args:
-        params: Query parameters for adding a book. Expected to be an instance of
-        CreateBookRequest.
+        params (CreateBookRequest): The parameters for creating a new book, coming from
+        the request body.
 
     Returns:
-        JSON response indicating the success or failure of the add book operation.
+        The newly created book after being added to the system.
     """
-    return await bs.add_book(params)
+    return await bs.create_book(params)
 
 
 @app.delete("/books/{isbn}")
@@ -112,16 +115,13 @@ async def create_review(
     isbn: str = Depends(validators.validate_isbn), request: CreateReviewRequest = Body()
 ):
     """
-    Adds a review for a book with the given ISBN.
-
     Args:
-        isbn: The International Standard Book Number of the book.
-        request: An instance of CreateReviewRequest containing the review details.
-
-    Returns:
-        The result of adding the review to the book.
+        isbn: The ISBN of the book for which the review is to be created. This parameter
+        is validated using the `validators.validate_isbn` function.
+        request: A request body containing the details of the review to be created. This
+        parameter is expected to be an instance of `CreateReviewRequest`.
     """
-    return await bs.add_review(isbn, request)
+    return await bs.create_review(isbn, request)
 
 
 @app.get("/books/{isbn}/reviews")

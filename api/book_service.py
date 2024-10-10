@@ -1,44 +1,95 @@
 """
 book_service.py
 
-This module provides the core services for managing book-related operations.
-It includes functions for querying, adding, deleting books, and managing
-book ratings and reviews. Additionally, it contains utility functions for
-filtering and managing book data.
+This module provides various services related to book management. It includes functions
+for filtering, adding, deleting, and querying books, as well as handling book ratings
+and reviews.
 
 Functions:
-    _filter_books(books, filter_params):
-        Applies various filtering criteria to a list of books based on
-        provided parameters.
+    _filter_books(books: list, query_params: BookQueryParameters) -> list:
+        Filters books based on given query parameters like author, category, and ISBN.
 
-    _limit_books(books, limit):
-        Limits the number of books returned based on the specified limit.
+    _limit_books(books: list, limit: int) -> list:
+        Limits the number of books returned to a specified top N value.
 
-    _exclude_deleted_books(books):
-        Excludes books marked as deleted from the provided list.
+    _exclude_deleted_books(books: list, include_deleted: bool) -> list:
+        Excludes books marked as soft-deleted from the list of books unless
+        include_deleted is set to True.
 
-    _get_author_last_name(author):
-        Retrieves the last name of an author from the author metadata.
+    _get_author_last_name(author_name: str) -> str:
+        Extracts the last name from the full author name for sorting purposes.
 
-    query_book(query_params):
-        Queries books based on given parameters. Supports searching and
-        filtering of book data.
+    query_book(query_params: BookQueryParameters) -> list:
+        Returns a list of books based on the provided query parameters. It applies
+        filters, limits the results, and sorts the list based on the author's last name.
 
-    add_book(book_data):
-        Adds a new book to the collection. Requires book details such as title,
-        author, published date, etc.
+    create_book(book_data: CreateBookRequest) -> dict:
+        Adds a new book to the list using the provided book details and returns
+        the created book.
 
-    delete_book(book_id):
-        Marks a book as deleted based on the provided book ID.
+    delete_book(book_id: int) -> None:
+        Marks a book as soft-deleted based on the provided book ID.
 
-    add_rating(book_id, rating_data):
-        Adds a rating to a specific book. Requires book ID and rating details.
+    add_rating(book_id: int, rating_data: AddRatingParameters) -> None:
+        Adds a rating to the specified book and updates its average rating and
+        total number of ratings.
 
-    add_review(book_id, review_data):
-        Adds a review to a specific book. Requires book ID and review details.
+    create_review(book_id: int, review_data: CreateReviewRequest) -> None:
+        Adds a review to the specified book based on the provided review content.
 
-    get_reviews(book_id):
-        Retrieves reviews for a specific book based on the book ID.
+    get_reviews(book_id: int) -> list:
+        Retrieves all reviews for the specified book.
+
+Example usage:
+    Querying books with specific parameters:
+
+    ```python
+    query_params = BookQueryParameters(
+        author="J.K. Rowling",
+        category="Fantasy",
+        top=10)
+    books = query_book(query_params)
+    print(books)
+    ```
+
+    Adding a new book:
+
+    ```python
+    new_book = CreateBookRequest(
+        author="J.K. Rowling",
+        title="New Book",
+        category="Fantasy",
+        isbn="1234567890123")
+    created_book = create_book(new_book)
+    print(created_book)
+    ```
+
+    Deleting a book:
+
+    ```python
+    delete_book(book_id=1)
+    ```
+
+    Adding a rating to a book:
+
+    ```python
+    rating = AddRatingParameters(rating=4.5)
+    add_rating(book_id=1, rating_data=rating)
+    ```
+
+    Adding a review to a book:
+
+    ```python
+    review = CreateReviewRequest(review="Great book!")
+    create_review(book_id=1, review_data=review)
+    ```
+
+    Getting reviews for a book:
+
+    ```python
+    reviews = get_reviews(book_id=1)
+    print(reviews)
+    ```
 """
 
 from typing import Dict, List, Optional
@@ -98,7 +149,7 @@ async def query_book(params: BookQueryParameters) -> List[Dict[str, Optional[str
     return filtered_books
 
 
-async def add_book(params: CreateBookRequest) -> None:
+async def create_book(params: CreateBookRequest) -> None:
     """
     Adds a book to the BOOKS list.
 
@@ -144,7 +195,7 @@ async def add_rating(isbn: str, params: AddRatingParameters):
     book["avg_rating"] = book["sum_ratings"] / book["num_ratings"]
 
 
-async def add_review(isbn: str, request: CreateReviewRequest):
+async def create_review(isbn: str, request: CreateReviewRequest):
     """
     Args:
         isbn: The International Standard Book Number of the book.
