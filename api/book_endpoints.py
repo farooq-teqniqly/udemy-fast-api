@@ -66,7 +66,7 @@ async def query_book(params: BookQueryParameters = Depends()):
 
 
 @app.post("/books")
-async def add_book(params: CreateBookRequest = Depends()):
+async def add_book(params: CreateBookRequest = Body()):
     """
     Args:
         params: Query parameters for adding a book. Expected to be an instance of
