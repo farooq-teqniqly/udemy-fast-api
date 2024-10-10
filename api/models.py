@@ -20,7 +20,7 @@ Classes:
         to a book. Ensures that the rating value is within the specified range of
         1.0 to 5.0.
 
-    AddReviewRequest:
+    CreateReviewRequest:
         A Pydantic model representing the request to add a review. Includes the
         review content.
 
@@ -57,7 +57,7 @@ Example usage:
     Creating a parameter instance for adding a review:
 
     ```python
-    review_params = AddReviewRequest(
+    review_params = CreateReviewRequest(
         review="Great book!")
     print(review_params.dict())
     ```
@@ -139,9 +139,9 @@ class AddRatingParameters(BaseModel):
     )
 
 
-class AddReviewRequest(BaseModel):
+class CreateReviewRequest(BaseModel):
     """
-    AddReviewRequest is a data model representing the request to add a review.
+    CreateReviewRequest is a data model representing the request to add a review.
 
     Attributes:
         review (str): The content of the review.

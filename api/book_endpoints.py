@@ -44,8 +44,8 @@ import api.validators as validators
 from api.models import (
     AddBookQueryParameters,
     AddRatingParameters,
-    AddReviewRequest,
     BookQueryParameters,
+    CreateReviewRequest,
 )
 
 app = FastAPI(title="My Books API")
@@ -109,14 +109,14 @@ async def add_rating(
 
 @app.post("/books/{isbn}/reviews")
 async def add_review(
-    isbn: str = Depends(validators.validate_isbn), request: AddReviewRequest = Body()
+    isbn: str = Depends(validators.validate_isbn), request: CreateReviewRequest = Body()
 ):
     """
     Adds a review for a book with the given ISBN.
 
     Args:
         isbn: The International Standard Book Number of the book.
-        request: An instance of AddReviewRequest containing the review details.
+        request: An instance of CreateReviewRequest containing the review details.
 
     Returns:
         The result of adding the review to the book.

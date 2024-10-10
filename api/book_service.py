@@ -47,8 +47,8 @@ from api.data import BOOK_REVIEWS, BOOKS
 from api.models import (
     AddBookQueryParameters,
     AddRatingParameters,
-    AddReviewRequest,
     BookQueryParameters,
+    CreateReviewRequest,
 )
 
 
@@ -144,11 +144,11 @@ async def add_rating(isbn: str, params: AddRatingParameters):
     book["avg_rating"] = book["sum_ratings"] / book["num_ratings"]
 
 
-async def add_review(isbn: str, request: AddReviewRequest):
+async def add_review(isbn: str, request: CreateReviewRequest):
     """
     Args:
         isbn: The International Standard Book Number of the book.
-        request: An instance of AddReviewRequest containing the review to be added.
+        request: An instance of CreateReviewRequest containing the review to be added.
     """
     book_reviews = BOOK_REVIEWS.setdefault(isbn, [])
 
