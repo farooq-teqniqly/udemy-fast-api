@@ -1,95 +1,31 @@
 """
-models.py
+Models for the book management API.
 
-This module defines several Pydantic models used for handling query parameters and
-request bodies in the book-related endpoints of the application. These models ensure
-data validation and structured representation of request parameters related to books,
-their ratings, and reviews.
+This module defines the data models used by the book management API. It includes the
+following classes and attributes:
 
 Attributes:
-    validators (module): A module containing validators for input data.
+    VALID_ISBN_REGEX (str): A regular expression pattern for validating ISBN numbers.
 
 Classes:
-    BookQueryParameters:
-        A Pydantic model representing query parameters for filtering and paginating
-        book search results. Includes attributes such as author, category, top,
-        ISBN, and a flag to include deleted books.
+    BookQueryParameters: Parameters for querying books.
+        - author (str): The author of the book.
+        - category (str): The category of the book.
+        - top (int): The number of top books to return.
+        - isbn (str): The ISBN of the book.
+        - return_deleted_books (bool): A flag to include deleted books in the results.
 
-        Class Attributes:
-            - author (Optional[str]): The author of the book.
-            - category (Optional[str]): The category or genre of the book.
-            - top (Optional[int]): The top N records to return.
-            - isbn (Optional[str]): The ISBN number of the book.
-            - return_deleted_books (bool): Flag to include deleted books in the query.
+    CreateBookRequest: Parameters for creating a new book.
+        - author (str): The author of the book.
+        - title (str): The title of the book.
+        - category (str): The category of the book.
+        - isbn (str): The ISBN of the book.
 
-        Methods:
-            - isbn_must_be_13_digits(cls, value): Validates that the ISBN is exactly 13
-            digits long if provided.
+    AddRatingParameters: Parameters for adding a rating to a book.
+        - rating (int): The rating value.
 
-    CreateBookRequest:
-        A Pydantic model representing the mandatory parameters required for adding
-        a new book. Includes attributes such as author, title, category, and ISBN.
-
-        Class Attributes:
-            - author (str): The author of the book.
-            - title (str): The title of the book.
-            - category (str): The category or genre of the book.
-            - isbn (str): The ISBN number of the book, must be exactly 13 numeric
-                digits.
-
-    AddRatingParameters:
-        A Pydantic model representing the parameters required for adding a rating
-        to a book. Ensures that the rating value is within the specified range of
-        1.0 to 5.0.
-
-        Class Attributes:
-            - rating (confloat): A floating-point number for the rating, constrained
-              to be between 1.0 and 5.0 inclusive.
-
-    CreateReviewRequest:
-        A Pydantic model representing the request to add a review. Includes the
-        review content.
-
-        Class Attributes:
-            - review (str): The content of the review.
-
-Example usage:
-    Creating a query parameter instance for book search:
-
-    ```python
-    query_params = BookQueryParameters(
-        author="J.K. Rowling",
-        category="Fantasy",
-        top=10)
-    print(query_params.dict())
-    ```
-
-    Creating a parameter instance for adding a new book:
-
-    ```python
-    add_params = CreateBookRequest(
-        author="J.K. Rowling",
-        title="New Book",
-        category="Fantasy",
-        isbn="1234567890123")
-    print(add_params.dict())
-    ```
-
-    Creating a parameter instance for adding a rating:
-
-    ```python
-    rating_params = AddRatingParameters(
-        rating=4.5)
-    print(rating_params.dict())
-    ```
-
-    Creating a parameter instance for adding a review:
-
-    ```python
-    review_params = CreateReviewRequest(
-        review="Great book!")
-    print(review_params.dict())
-    ```
+    CreateReviewRequest: Parameters for creating a review for a book.
+        - review (str): The content of the review.
 """
 
 from typing import Optional
@@ -101,21 +37,17 @@ VALID_ISBN_REGEX = r"\d{13}"
 
 class BookQueryParameters(BaseModel):
     """
-    BookQueryParameters Model
-
-    Represents query parameters for querying book records.
+    BookQueryParameters is a model used to encapsulate the query parameters for
+    searching books in a library system.
 
     Attributes:
-        author (Optional[str]): The author of the book.
-        category (Optional[str]): The category or genre of the book.
-        top (Optional[int]): The top N records to return.
-        isbn (Optional[str]): The ISBN number of the book.
-        return_deleted_books (bool): Flag to include deleted books in the query.
-        Defaults to False.
-
-    Methods:
-        isbn_must_be_13_digits(cls, value):
-            Validates that the ISBN is exactly 13 digits long if provided.
+        author: The author of the book. Optional.
+        category: The category of the book. Optional.
+        top: The maximum number of top results to return. Optional.
+        isbn: The ISBN of the book. This field must match the provided ISBN pattern.
+        Optional.
+        return_deleted_books: A flag indicating whether to return deleted books in the
+        query results. Defaults to False.
     """
 
     author: Optional[str] = None
@@ -127,13 +59,14 @@ class BookQueryParameters(BaseModel):
 
 class CreateBookRequest(BaseModel):
     """
-    Class representing a request to create a book.
+    Class for creating a book request.
 
     Attributes:
-        author: The name of the book's author.
+        author: The author of the book.
         title: The title of the book.
         category: The category or genre of the book.
-        isbn: The ISBN of the book, which is validated by the `validate_isbn` function.
+        isbn: The International Standard Book Number (ISBN) of the book, which must
+        match the VALID_ISBN_REGEX pattern.
     """
 
     author: str
