@@ -40,11 +40,11 @@ Functions:
 """
 
 import uvicorn
-from fastapi import Body, Depends, FastAPI
+from fastapi import Body, Depends, FastAPI, Path
 
 import api.book_service as bs
-import api.validators as validators
 from api.models import (
+    VALID_ISBN_REGEX,
     AddRatingParameters,
     BookQueryParameters,
     CreateBookRequest,
@@ -69,7 +69,7 @@ async def query_book(params: BookQueryParameters = Depends()):
 
 
 @app.post("/books")
-async def create_book(params: CreateBookRequest = Body()):
+async def create_book(params: CreateBookRequest):
     """
     Args:
         params (CreateBookRequest): The parameters for creating a new book, coming from
@@ -82,7 +82,7 @@ async def create_book(params: CreateBookRequest = Body()):
 
 
 @app.delete("/books/{isbn}")
-async def delete_book(isbn: str = Depends(validators.validate_isbn)):
+async def delete_book(isbn: str = Path(pattern=VALID_ISBN_REGEX)):
     """
     Args:
         isbn: The International Standard Book Number (ISBN) of the book to be deleted.
@@ -97,7 +97,7 @@ async def delete_book(isbn: str = Depends(validators.validate_isbn)):
 
 @app.post("/books/{isbn}/ratings")
 async def add_rating(
-    isbn: str = Depends(validators.validate_isbn),
+    isbn: str = Path(pattern=VALID_ISBN_REGEX),
     params: AddRatingParameters = Body(),
 ):
     """
@@ -112,7 +112,7 @@ async def add_rating(
 
 @app.post("/books/{isbn}/reviews")
 async def create_review(
-    isbn: str = Depends(validators.validate_isbn), request: CreateReviewRequest = Body()
+    isbn: str = Path(pattern=VALID_ISBN_REGEX), request: CreateReviewRequest = Body()
 ):
     """
     Args:
@@ -125,7 +125,7 @@ async def create_review(
 
 
 @app.get("/books/{isbn}/reviews")
-async def get_reviews(isbn: str = Depends(validators.validate_isbn)):
+async def get_reviews(isbn: str = Path(pattern=VALID_ISBN_REGEX)):
     """
     Args:
         isbn: A string representing the International Standard Book Number (ISBN).

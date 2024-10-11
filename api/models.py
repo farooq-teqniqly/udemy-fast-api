@@ -94,10 +94,9 @@ Example usage:
 
 from typing import Optional
 
-from fastapi.params import Depends
-from pydantic import BaseModel, Field, confloat, field_validator
+from pydantic import BaseModel, Field, confloat
 
-import api.validators as validators
+VALID_ISBN_REGEX = r"\d{13}"
 
 
 class BookQueryParameters(BaseModel):
@@ -122,17 +121,8 @@ class BookQueryParameters(BaseModel):
     author: Optional[str] = None
     category: Optional[str] = None
     top: Optional[int] = None
-    isbn: Optional[str] = None
+    isbn: Optional[str] = Field(None, pattern=VALID_ISBN_REGEX)
     return_deleted_books: bool = False
-
-    @field_validator("isbn", check_fields=False)
-    @classmethod
-    def isbn_must_be_13_digits(cls, value):
-        if not value:
-            return None
-
-        validators.validate_isbn(value)
-        return value
 
 
 class CreateBookRequest(BaseModel):
@@ -149,7 +139,7 @@ class CreateBookRequest(BaseModel):
     author: str
     title: str
     category: str
-    isbn: str = Depends(validators.validate_isbn)
+    isbn: str = Field(pattern=VALID_ISBN_REGEX)
 
 
 class AddRatingParameters(BaseModel):
