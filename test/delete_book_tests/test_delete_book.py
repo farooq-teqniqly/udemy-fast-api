@@ -1,3 +1,7 @@
+"""
+This module contains test cases for the DELETE /books/{isbn} endpoint of the API.
+"""
+
 from test import client
 
 
