@@ -1,8 +1,4 @@
-from fastapi.testclient import TestClient
-
-from api.book_endpoints import app
-
-client = TestClient(app)
+from test import client
 
 
 def test_delete_book_fails_with_invalid_isbn_in_url():
