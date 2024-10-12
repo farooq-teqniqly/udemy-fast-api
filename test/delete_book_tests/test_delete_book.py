@@ -4,6 +4,8 @@ This module contains test cases for the DELETE /books/{isbn} endpoint of the API
 
 from test import client
 
+import api.http_status_codes as status_code
+
 VALID_ISBN = "4444444444444"
 INVALID_ISBN = "foobar1234"
 NON_EXISTENT_ISBN = "0000000000000"
@@ -15,7 +17,7 @@ def _setup_mock_books(mocker, books):
 
 def test_delete_book_fails_with_invalid_isbn_in_url():
     response = client.delete(f"/books/{INVALID_ISBN}")
-    assert response.status_code == 422
+    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
 
 
 def test_delete_book_when_successful_sets_soft_deleted_to_true(mocker):
@@ -34,7 +36,7 @@ def test_delete_book_when_successful_sets_soft_deleted_to_true(mocker):
 
     _setup_mock_books(mocker, mock_books)
     response = client.delete(f"/books/{VALID_ISBN}")
-    assert response.status_code == 200
+    assert response.status_code == status_code.OK
     assert mock_books[0]["soft_deleted"]
 
 
@@ -55,4 +57,4 @@ def test_delete_book_succeeds_even_when_book_does_not_exist(mocker):
     _setup_mock_books(mocker, mock_books)
     mocker.patch("api.book_service.BOOKS", mock_books)
     response = client.delete(f"/books/{NON_EXISTENT_ISBN}")
-    assert response.status_code == 200
+    assert response.status_code == status_code.OK
