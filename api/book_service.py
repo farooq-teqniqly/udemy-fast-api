@@ -165,6 +165,7 @@ async def create_book(params: CreateBookRequest) -> None:
             isbn=params.isbn,
             avg_rating=None,
             num_ratings=None,
+            soft_deleted=False,
         )
     )
 
