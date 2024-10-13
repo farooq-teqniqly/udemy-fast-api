@@ -9,8 +9,6 @@ import test_data
 
 import api.http_status_codes as status_code
 
-VALID_ISBN = "4444444444444"
-
 
 def _setup_mock_books(mocker, books):
     mocker.patch("api.book_service.BOOKS", books)
@@ -25,7 +23,7 @@ def test_delete_book_fails_when_isbn_invalid(isbn):
 def test_delete_book_when_successful_sets_soft_deleted_to_true(mocker):
     mock_books = [
         dict(
-            isbn=VALID_ISBN,
+            isbn=test_data.VALID_ISBN,
             title="A Brief History of Time",
             author="Stephen Hawking",
             category="Science",
@@ -37,7 +35,7 @@ def test_delete_book_when_successful_sets_soft_deleted_to_true(mocker):
     ]
 
     _setup_mock_books(mocker, mock_books)
-    response = client.delete(f"/books/{VALID_ISBN}")
+    response = client.delete(f"/books/{test_data.VALID_ISBN}")
     assert response.status_code == status_code.OK
     assert mock_books[0]["soft_deleted"]
 
@@ -45,7 +43,7 @@ def test_delete_book_when_successful_sets_soft_deleted_to_true(mocker):
 def test_delete_book_succeeds_even_when_book_does_not_exist(mocker):
     mock_books = [
         dict(
-            isbn=VALID_ISBN,
+            isbn=test_data.VALID_ISBN,
             title="A Brief History of Time",
             author="Stephen Hawking",
             category="Science",

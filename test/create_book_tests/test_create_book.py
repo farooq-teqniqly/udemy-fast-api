@@ -6,8 +6,6 @@ import test_data
 
 import api.http_status_codes as status_code
 
-VALID_ISBN = "4444444444444"
-
 
 def _setup_mock_books(mocker, books):
     mocker.patch("api.book_service.BOOKS", books)
@@ -20,7 +18,7 @@ def test_create_book_is_successful(mocker):
     request = dict(
         title="The Great Gatsby",
         author="F. Scott Fitzgerald",
-        isbn=VALID_ISBN,
+        isbn=test_data.VALID_ISBN,
         category="Classics",
     )
 
@@ -40,14 +38,14 @@ def test_create_book_is_successful(mocker):
 @pytest.mark.parametrize(
     ("title", "author", "isbn", "category"),
     [
-        (None, "Stephen King", VALID_ISBN, "Horror"),
-        ("", "Stephen King", VALID_ISBN, "Horror"),
-        ("The Stand", None, VALID_ISBN, "Horror"),
-        ("The Stand", "", VALID_ISBN, "Horror"),
+        (None, "Stephen King", test_data.VALID_ISBN, "Horror"),
+        ("", "Stephen King", test_data.VALID_ISBN, "Horror"),
+        ("The Stand", None, test_data.VALID_ISBN, "Horror"),
+        ("The Stand", "", test_data.VALID_ISBN, "Horror"),
         ("The Stand", "Stephen King", None, "Horror"),
         ("The Stand", "Stephen King", "", "Horror"),
-        ("The Stand", "Stephen King", VALID_ISBN, None),
-        ("The Stand", "Stephen King", VALID_ISBN, ""),
+        ("The Stand", "Stephen King", test_data.VALID_ISBN, None),
+        ("The Stand", "Stephen King", test_data.VALID_ISBN, ""),
     ],
 )
 def test_create_book_fails_when_request_is_missing_required_attributes(
