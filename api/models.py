@@ -32,7 +32,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, confloat
 
-VALID_ISBN_REGEX = r"\d{13}"
+VALID_ISBN_REGEX = r"^\d{13}$"
 
 
 class BookQueryParameters(BaseModel):

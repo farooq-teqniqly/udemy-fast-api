@@ -5,6 +5,7 @@ This module contains test cases for the DELETE /books/{isbn} endpoint of the API
 from test import client
 
 import pytest
+import test_data
 
 import api.http_status_codes as status_code
 
@@ -15,7 +16,7 @@ def _setup_mock_books(mocker, books):
     mocker.patch("api.book_service.BOOKS", books)
 
 
-@pytest.mark.parametrize("isbn", ["foobar1234", "aaaaaaaaaaaaa", "aaaaaaaaaa111"])
+@pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
 def test_delete_book_fails_when_isbn_invalid(isbn):
     response = client.delete(f"/books/{isbn}")
     assert response.status_code == status_code.UNPROCESSABLE_ENTITY

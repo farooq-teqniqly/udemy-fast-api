@@ -2,6 +2,7 @@ import json
 from test import client
 
 import pytest
+import test_data
 
 import api.http_status_codes as status_code
 
@@ -45,20 +46,31 @@ def test_create_book_is_successful(mocker):
         ("The Stand", "", VALID_ISBN, "Horror"),
         ("The Stand", "Stephen King", None, "Horror"),
         ("The Stand", "Stephen King", "", "Horror"),
-        ("The Stand", "Stephen King", "fffffffff1111", "Horror"),
-        ("The Stand", "Stephen King", "fffffffffffff", "Horror"),
-        ("The Stand", "Stephen King", "11111111111111", "Horror"),
-        ("The Stand", "Stephen King", "111111111111", "Horror"),
         ("The Stand", "Stephen King", VALID_ISBN, None),
         ("The Stand", "Stephen King", VALID_ISBN, ""),
     ],
 )
-def test_create_book_fails_with_invalid_request(title, author, isbn, category):
+def test_create_book_fails_when_request_is_missing_required_attributes(
+    title, author, isbn, category
+):
     request = dict(
         title=title,
         author=author,
         isbn=isbn,
         category=category,
+    )
+
+    response = client.post("/books", json=json.dumps(request))
+    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
+def test_create_book_fails_wth_invalid_isbn(isbn):
+    request = dict(
+        title="The Stand",
+        author="Stephen King",
+        isbn=isbn,
+        category="Horror",
     )
 
     response = client.post("/books", json=json.dumps(request))
