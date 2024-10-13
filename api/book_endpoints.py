@@ -23,7 +23,7 @@ from fastapi import Body, Depends, FastAPI, Path
 import api.book_service as bs
 from api.models import (
     VALID_ISBN_REGEX,
-    AddRatingParameters,
+    AddRatingRequest,
     BookQueryParameters,
     CreateBookRequest,
     CreateReviewRequest,
@@ -78,14 +78,14 @@ async def delete_book(isbn: str = Path(pattern=VALID_ISBN_REGEX)):
 @app.post("/books/{isbn}/ratings")
 async def add_rating(
     isbn: str = Path(pattern=VALID_ISBN_REGEX),
-    params: AddRatingParameters = Body(),
+    params: AddRatingRequest = Body(),
 ):
     """
     Args:
         isbn: The ISBN of the book for which the rating is being added. Must match the
         VALID_ISBN_REGEX pattern.
         params: The parameters for adding the rating, encapsulated in an
-        AddRatingParameters object.
+        AddRatingRequest object.
     """
     return await bs.add_rating(isbn, params)
 

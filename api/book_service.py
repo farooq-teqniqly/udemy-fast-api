@@ -30,7 +30,7 @@ Functions:
     delete_book(book_id: int) -> None:
         Marks a book as soft-deleted based on the provided book ID.
 
-    add_rating(book_id: int, rating_data: AddRatingParameters) -> None:
+    add_rating(book_id: int, rating_data: AddRatingRequest) -> None:
         Adds a rating to the specified book and updates its average rating and
         total number of ratings.
 
@@ -73,7 +73,7 @@ Example usage:
     Adding a rating to a book:
 
     ```python
-    rating = AddRatingParameters(rating=4.5)
+    rating = AddRatingRequest(rating=4.5)
     add_rating(book_id=1, rating_data=rating)
     ```
 
@@ -96,7 +96,7 @@ from typing import Dict, List, Optional
 
 from api.data import BOOK_REVIEWS, BOOKS
 from api.models import (
-    AddRatingParameters,
+    AddRatingRequest,
     BookQueryParameters,
     CreateBookRequest,
     CreateReviewRequest,
@@ -184,7 +184,7 @@ async def delete_book(isbn: str) -> None:
         books[0]["soft_deleted"] = True
 
 
-async def add_rating(isbn: str, params: AddRatingParameters):
+async def add_rating(isbn: str, params: AddRatingRequest):
     books = [b for b in BOOKS if b["isbn"] == isbn]
 
     if len(books) == 0:

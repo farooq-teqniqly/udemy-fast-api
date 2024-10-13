@@ -21,7 +21,7 @@ Classes:
         - category (str): The category of the book.
         - isbn (str): The ISBN of the book.
 
-    AddRatingParameters: Parameters for adding a rating to a book.
+    AddRatingRequest: Parameters for adding a rating to a book.
         - rating (int): The rating value.
 
     CreateReviewRequest: Parameters for creating a review for a book.
@@ -75,15 +75,12 @@ class CreateBookRequest(BaseModel):
     isbn: str = Field(pattern=VALID_ISBN_REGEX)
 
 
-class AddRatingParameters(BaseModel):
+class AddRatingRequest(BaseModel):
     """
-    Represents the parameters required to add a rating.
-    This class is responsible for validating that the
-    rating value is within the specified range of 1.0 to 5.0.
+    AddRatingRequest represents a request to add a rating.
 
     Attributes:
-        rating: A floating-point number for the rating, constrained
-                to be between 1.0 and 5.0 inclusive.
+        rating (float): The rating value, which must be between 1 and 5.
     """
 
     rating: confloat(ge=1.0, le=5.0) = Field(
