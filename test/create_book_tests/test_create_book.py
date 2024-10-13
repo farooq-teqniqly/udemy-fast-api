@@ -7,13 +7,8 @@ import test_data
 import api.http_status_codes as status_code
 
 
-def _setup_mock_books(mocker, books):
-    mocker.patch("api.book_service.BOOKS", books)
-
-
 def test_create_book_is_successful(mocker):
-    mock_books = []
-    _setup_mock_books(mocker, mock_books)
+    mock_books = test_data.setup_mock_books(mocker, [])
 
     request = dict(
         title="The Great Gatsby",
