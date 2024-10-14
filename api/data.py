@@ -53,7 +53,7 @@ Example:
     ```
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 BOOKS = [
     dict(
@@ -128,4 +128,4 @@ BOOKS = [
     ),
 ]
 
-BOOK_REVIEWS: Dict[str, Optional[List[str]]] = {}
+BOOK_REVIEWS: List[Dict[str, List[str]]] = []

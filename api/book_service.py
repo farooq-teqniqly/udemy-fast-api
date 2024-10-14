@@ -212,11 +212,12 @@ async def create_review(isbn: str, request: CreateReviewRequest):
 
 async def get_reviews(isbn: str):
     """
+    Fetch reviews for a given ISBN from the BOOK_REVIEWS list.
+
     Args:
-        isbn (str): The ISBN number of the book for which reviews are to be fetched.
+        isbn: A string representing the ISBN for which reviews are to be fetched.
 
     Returns:
-        list: A list containing reviews for the book. If no reviews are found, an empty
-        list is returned.
+        A list of dictionaries containing reviews that match the given ISBN.
     """
-    return BOOK_REVIEWS.get(isbn, [])
+    return [r for r in BOOK_REVIEWS if r["isbn"] == isbn]

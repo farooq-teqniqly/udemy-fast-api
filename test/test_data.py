@@ -14,9 +14,21 @@ MOCK_BOOKS = [
     )
 ]
 
+MOCK_REVIEWS = [
+    dict(isbn=VALID_ISBN, reviews=["Great book!"]),
+]
 
-def setup_mock_books(mocker, books=None) -> dict:
+
+def setup_mock_books(mocker, books=None) -> list:
     if books is None:
         books = MOCK_BOOKS
     mocker.patch("api.book_service.BOOKS", books)
     return books
+
+
+def setup_mock_reviews(mocker, reviews=None) -> list:
+    if reviews is None:
+        reviews = MOCK_REVIEWS
+
+    mocker.patch("api.book_service.BOOK_REVIEWS", reviews)
+    return reviews
