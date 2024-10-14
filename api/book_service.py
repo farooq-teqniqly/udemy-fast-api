@@ -202,12 +202,16 @@ async def create_review(isbn: str, request: CreateReviewRequest):
         isbn: The International Standard Book Number of the book.
         request: An instance of CreateReviewRequest containing the review to be added.
     """
-    book_reviews = BOOK_REVIEWS.setdefault(isbn, [])
-
     if not any(book for book in BOOKS if book["isbn"] == isbn):
         return
 
-    book_reviews.append(request.review)
+    reviews = [r for r in BOOK_REVIEWS if r["isbn"] == isbn]
+
+    if not reviews:
+        reviews.append(dict(isbn=isbn, reviews=[request.review]))
+        return
+
+    reviews[0]["reviews"].append(request.review)
 
 
 async def get_reviews(isbn: str):
