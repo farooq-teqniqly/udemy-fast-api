@@ -8,5 +8,5 @@ pre-commit install
 
 ## Run Books API
 ```powershell
- uvicorn api.books:app --reload 
+ uvicorn api.book_endpoints:app --reload 
 ```

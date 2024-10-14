@@ -35,6 +35,10 @@ from pydantic import BaseModel, Field, confloat
 VALID_ISBN_REGEX = r"^\d{13}$"
 
 
+def _create_model_config(example: dict) -> dict:
+    return {"json_schema_extra": {"example": example}}
+
+
 class BookQueryParameters(BaseModel):
     """
     BookQueryParameters is a model used to encapsulate the query parameters for
@@ -74,6 +78,15 @@ class CreateBookRequest(BaseModel):
     category: str
     isbn: str = Field(pattern=VALID_ISBN_REGEX)
 
+    model_config = _create_model_config(
+        dict(
+            author="Douglas Adams",
+            title="The Hitchhiker's Guide to the Galaxy",
+            category="Science Fiction",
+            isbn="9780345533011",
+        )
+    )
+
 
 class AddRatingRequest(BaseModel):
     """
@@ -87,6 +100,8 @@ class AddRatingRequest(BaseModel):
         description="Rating must be between 1 and 5."
     )
 
+    model_config = _create_model_config(dict(rating=3.5))
+
 
 class CreateReviewRequest(BaseModel):
     """
@@ -97,3 +112,7 @@ class CreateReviewRequest(BaseModel):
     """
 
     review: str
+
+    model_config = _create_model_config(
+        dict(review="I really enjoyed reading this book.")
+    )
