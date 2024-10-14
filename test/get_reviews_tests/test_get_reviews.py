@@ -1,5 +1,6 @@
 from test import client
 
+import pytest
 import test_data
 
 import api.http_status_codes as status_code
@@ -25,3 +26,9 @@ def test_get_reviews_when_book_does_not_exist_returns_empty_list(mocker):
     response = client.get("/books/0000000000000/reviews")
     assert response.status_code == status_code.OK
     assert response.json() == []
+
+
+@pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
+def test_get_reviews_fails_when_isbn_invalid(isbn):
+    response = client.get(f"/books/{isbn}/reviews")
+    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
