@@ -30,6 +30,7 @@ Classes:
 
 from typing import Optional
 
+from fastapi import HTTPException
 from pydantic import (
     BaseModel,
     Field,
@@ -37,6 +38,8 @@ from pydantic import (
     model_validator,
 )
 from typing_extensions import Self
+
+import api.http_status_codes as status_code
 
 VALID_ISBN_REGEX = r"^\d{13}$"
 
@@ -77,7 +80,7 @@ class BookQueryParameters(BaseModel):
         if self.min_rating is not None and self.max_rating is not None:
             if self.max_rating <= self.min_rating:
                 msg = "max_rating must be greater than min_rating."
-                raise ValueError(msg)
+                raise HTTPException(status_code=status_code.BAD_REQUEST, detail=msg)
         return self
 
 
