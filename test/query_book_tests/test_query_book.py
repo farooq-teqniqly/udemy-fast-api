@@ -13,15 +13,57 @@ def test_query_fails_when_isbn_invalid(isbn):
     assert response.status_code == status_code.UNPROCESSABLE_ENTITY
 
 
-book_attribute_values = ["Stephen Hawking", "Science", 1, test_data.VALID_ISBN]
-all_valid_values = [(v, None) for v in book_attribute_values]
-combinations = list(product(*[v for v in all_valid_values]))
+def get_combinations(book_attribute_values: list) -> list:
+    all_valid_values = []
+
+    for i in range(len(book_attribute_values)):
+        all_valid_values.append((book_attribute_values[i], None))
+
+    return list(product(*all_valid_values))
 
 
-@pytest.mark.parametrize(("author", "category", "top", "isbn"), combinations)
-def test_query_combinations(mocker, author: str, category: str, top: bool, isbn: str):
-    mock_books = test_data.setup_mock_books(mocker)
-    query_parameters = dict(author=author, category=category, top=top, isbn=isbn)
+@pytest.mark.parametrize(
+    (
+        "author",
+        "category",
+        "top",
+        "isbn",
+        "min_rating",
+        "max_rating",
+    ),
+    get_combinations(["Stephen Hawking", "Science", 1, test_data.VALID_ISBN, 3.5, 4.5]),
+)
+def test_query_combinations_that_return_results(
+    mocker,
+    author: str,
+    category: str,
+    top: int,
+    isbn: str,
+    min_rating: float,
+    max_rating: float,
+):
+    mock_books = [
+        dict(
+            isbn=test_data.VALID_ISBN,
+            title="A Brief History of Time",
+            author="Stephen Hawking",
+            category="Science",
+            avg_rating=4.3,
+            num_ratings=0,
+            sum_ratings=0,
+            soft_deleted=False,
+        )
+    ]
+
+    test_data.setup_mock_books(mocker, mock_books)
+    query_parameters = dict(
+        author=author,
+        category=category,
+        top=top,
+        isbn=isbn,
+        min_rating=min_rating,
+        max_rating=max_rating,
+    )
     query_string = _get_query_string(query_parameters)
 
     response = client.get(f"/books/q?{query_string}")
@@ -36,16 +78,64 @@ def test_zero_not_a_valid_value_for_top():
     assert response.status_code == status_code.UNPROCESSABLE_ENTITY
 
 
-def test_query_can_return_no_results(mocker):
-    test_data.setup_mock_books(mocker)
-    response = client.get("/books/q?author=Bob")
+@pytest.mark.parametrize(
+    (
+        "author",
+        "category",
+        "isbn",
+        "min_rating",
+        "max_rating",
+    ),
+    get_combinations(["John Doe", "Biography", "0000000000000", 1, 4]),
+)
+def test_query_combinations_that_return_no_results(
+    mocker, author: str, category: str, isbn: str, min_rating: float, max_rating: float
+):
+    if min_rating is None or max_rating is None:
+        return
+
+    mock_books = [
+        dict(
+            isbn=test_data.VALID_ISBN,
+            title="A Brief History of Time",
+            author="Stephen Hawking",
+            category="Science",
+            avg_rating=4.3,
+            num_ratings=0,
+            sum_ratings=0,
+            soft_deleted=False,
+        )
+    ]
+
+    test_data.setup_mock_books(mocker, mock_books)
+
+    query_parameters = dict(
+        author=author,
+        category=category,
+        top=None,
+        isbn=isbn,
+        min_rating=min_rating,
+        max_rating=max_rating,
+    )
+
+    query_string = _get_query_string(query_parameters)
+
+    response = client.get(f"/books/q?{query_string}")
     assert response.status_code == status_code.OK
+
     assert response.json() == []
 
 
 def _get_query_string(query_parameters: dict) -> str:
     query_string = ""
-    possible_parameters = ["author", "category", "top", "isbn"]
+    possible_parameters = [
+        "author",
+        "category",
+        "top",
+        "isbn",
+        "min_rating",
+        "max_rating",
+    ]
 
     for p in possible_parameters:
         if p in query_parameters and query_parameters[p] is not None:

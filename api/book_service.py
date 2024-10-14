@@ -105,7 +105,7 @@ from api.models import (
 
 def _filter_books(
     books: List[Dict[str, Optional[str]]], key: str, value: Optional[str]
-) -> List[Dict[str, Optional[str]]]:
+) -> List[dict]:
     if value:
         return [
             book for book in books if book.get(key, "").casefold() == value.casefold()
@@ -127,19 +127,30 @@ def _get_author_last_name(name: str) -> str:
     return name.split()[-1]
 
 
-async def query_book(params: BookQueryParameters) -> List[Dict[str, Optional[str]]]:
+async def query_book(params: BookQueryParameters) -> List[dict]:
     """
     Args:
-        params: The parameters for querying books, including author, category, isbn,
-        and top limit.
+        params: BookQueryParameters object containing the criteria for querying books.
+        Includes author, category, isbn, minimum rating, maximum rating, and a flag for
+        returning deleted books or not.
 
     Returns:
-        A list of dictionaries, where each dictionary represents a book with optional
-        string fields.
+        A list of dictionaries, where each dictionary represents a book that matches the
+        given query parameters.
     """
     filtered_books = _filter_books(BOOKS, "author", params.author)
     filtered_books = _filter_books(filtered_books, "category", params.category)
     filtered_books = _filter_books(filtered_books, "isbn", params.isbn)
+
+    if params.min_rating is None:
+        params.min_rating = 1.0
+
+    if params.max_rating is None:
+        params.max_rating = 5.0
+
+    filtered_books = [b for b in filtered_books if b["avg_rating"] >= params.min_rating]
+
+    filtered_books = [b for b in filtered_books if b["avg_rating"] <= params.max_rating]
 
     if not params.return_deleted_books:
         filtered_books = _exclude_deleted_books(filtered_books)

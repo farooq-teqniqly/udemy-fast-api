@@ -41,23 +41,29 @@ def _create_model_config(example: dict) -> dict:
 
 class BookQueryParameters(BaseModel):
     """
-    BookQueryParameters is a model used to encapsulate the query parameters for
-    searching books in a library system.
+    Represents query parameters for searching books in a catalog.
 
     Attributes:
-        author: The author of the book. Optional.
-        category: The category of the book. Optional.
-        top: The maximum number of top results to return. Optional.
-        isbn: The ISBN of the book. This field must match the provided ISBN pattern.
-        Optional.
-        return_deleted_books: A flag indicating whether to return deleted books in the
-        query results. Defaults to False.
+        author (Optional[str]): The author of the book to search for.
+        category (Optional[str]): The category of the book to search for.
+        top (Optional[int]): The maximum number of books to return. Must be greater than
+        or equal to 1.
+        isbn (Optional[str]): The ISBN of the book to search for. Must match the
+        specified regular expression pattern for valid ISBNs.
+        min_rating (Optional[float]): The minimum rating of the book to search for. Must
+        be between 1.0 and 5.0.
+        max_rating (Optional[float]): The maximum rating of the book to search for. Must
+        be between 1.0 and 5.0.
+        return_deleted_books (bool): Whether to include deleted books in the search
+        results.
     """
 
     author: Optional[str] = None
     category: Optional[str] = None
     top: Optional[int] = Field(None, ge=1)
     isbn: Optional[str] = Field(None, pattern=VALID_ISBN_REGEX)
+    min_rating: Optional[float] = Field(None, ge=1.0, le=5.0)
+    max_rating: Optional[float] = Field(None, ge=1.0, le=5.0)
     return_deleted_books: bool = False
 
 
