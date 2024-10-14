@@ -37,9 +37,8 @@ from pydantic import (
     confloat,
     model_validator,
 )
+from starlette import status
 from typing_extensions import Self
-
-import api.http_status_codes as status_code
 
 VALID_ISBN_REGEX = r"^\d{13}$"
 MIN_RATING = 1.0
@@ -82,7 +81,7 @@ class BookQueryParameters(BaseModel):
         if self.min_rating is not None and self.max_rating is not None:
             if self.max_rating <= self.min_rating:
                 msg = "max_rating must be greater than min_rating."
-                raise HTTPException(status_code=status_code.BAD_REQUEST, detail=msg)
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
         return self
 
 

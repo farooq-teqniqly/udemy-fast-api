@@ -6,14 +6,13 @@ from test import client
 
 import pytest
 import test_data
-
-import api.http_status_codes as status_code
+from starlette import status
 
 
 @pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
 def test_delete_book_fails_when_isbn_invalid(isbn):
     response = client.delete(f"/books/{isbn}")
-    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_delete_book_when_successful_sets_soft_deleted_to_true(mocker):
@@ -32,7 +31,7 @@ def test_delete_book_when_successful_sets_soft_deleted_to_true(mocker):
 
     test_data.setup_mock_books(mocker, books)
     response = client.delete(f"/books/{test_data.VALID_ISBN}")
-    assert response.status_code == status_code.OK
+    assert response.status_code == status.HTTP_200_OK
     assert books[0]["soft_deleted"]
 
 
@@ -40,4 +39,4 @@ def test_delete_book_succeeds_even_when_book_does_not_exist(mocker):
     mock_books = test_data.setup_mock_books(mocker)
     mocker.patch("api.book_service.BOOKS", mock_books)
     response = client.delete("/books/0000000000000")
-    assert response.status_code == status_code.OK
+    assert response.status_code == status.HTTP_200_OK

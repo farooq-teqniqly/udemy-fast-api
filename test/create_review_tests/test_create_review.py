@@ -2,8 +2,7 @@ from test import client
 
 import pytest
 import test_data
-
-import api.http_status_codes as status_code
+from starlette import status
 
 
 def test_can_add_review_to_book(mocker):
@@ -12,7 +11,7 @@ def test_can_add_review_to_book(mocker):
     review_text = "This is a great book!"
     request = dict(review=review_text)
     response = client.post(f"/books/{test_data.VALID_ISBN}/reviews", json=request)
-    assert response.status_code == status_code.OK
+    assert response.status_code == status.HTTP_200_OK
     assert any(review_text in review_data["reviews"] for review_data in mock_reviews)
 
 
@@ -20,4 +19,4 @@ def test_can_add_review_to_book(mocker):
 def test_create_reviews_fails_when_isbn_invalid(isbn):
     request = dict(review="Yay!")
     response = client.post(f"/books/{isbn}/reviews", json=request)
-    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

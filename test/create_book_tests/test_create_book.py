@@ -3,8 +3,7 @@ from test import client
 
 import pytest
 import test_data
-
-import api.http_status_codes as status_code
+from starlette import status
 
 
 def test_create_book_is_successful(mocker):
@@ -18,7 +17,7 @@ def test_create_book_is_successful(mocker):
     )
 
     response = client.post("/books", json=request)
-    assert response.status_code == status_code.OK
+    assert response.status_code == status.HTTP_200_OK
 
     created_book = mock_books[0]
     assert created_book["title"] == request["title"]
@@ -54,7 +53,7 @@ def test_create_book_fails_when_request_is_missing_required_attributes(
     )
 
     response = client.post("/books", json=json.dumps(request))
-    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
@@ -67,4 +66,4 @@ def test_create_book_fails_wth_invalid_isbn(isbn):
     )
 
     response = client.post("/books", json=json.dumps(request))
-    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

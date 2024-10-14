@@ -19,6 +19,7 @@ Functions:
 
 import uvicorn
 from fastapi import Body, Depends, FastAPI, Path
+from starlette import status
 
 import api.book_service as bs
 from api.models import (
@@ -32,7 +33,7 @@ from api.models import (
 app = FastAPI(title="My Books API")
 
 
-@app.get("/books/q")
+@app.get("/books/q", status_code=status.HTTP_200_OK)
 async def query_book(params: BookQueryParameters = Depends()):
     """
     API endpoint to query books based on specified parameters.
@@ -105,7 +106,7 @@ async def create_review(
     return await bs.create_review(isbn, request)
 
 
-@app.get("/books/{isbn}/reviews")
+@app.get("/books/{isbn}/reviews", status_code=status.HTTP_200_OK)
 async def get_reviews(isbn: str = Path(pattern=VALID_ISBN_REGEX)):
     """
     Retrieve reviews for a book identified by its ISBN.

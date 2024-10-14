@@ -3,8 +3,7 @@ from test import client
 
 import pytest
 import test_data
-
-import api.http_status_codes as status_code
+from starlette import status
 
 
 def _get_query_string(query_parameters: dict) -> str:
@@ -37,7 +36,7 @@ def _get_combinations(book_attribute_values: list) -> list:
 @pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
 def test_query_fails_when_isbn_invalid(isbn):
     response = client.get(f"/books/q?isbn={isbn}")
-    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.parametrize(
@@ -87,7 +86,7 @@ def test_query_combinations_that_return_results(
     query_string = _get_query_string(query_parameters)
 
     response = client.get(f"/books/q?{query_string}")
-    assert response.status_code == status_code.OK
+    assert response.status_code == status.HTTP_200_OK
 
     books = list(response.json())
     assert books == mock_books
@@ -95,7 +94,7 @@ def test_query_combinations_that_return_results(
 
 def test_zero_not_a_valid_value_for_top():
     response = client.get("/books/q?top=0")
-    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.parametrize(
@@ -141,7 +140,7 @@ def test_query_combinations_that_return_no_results(
     query_string = _get_query_string(query_parameters)
 
     response = client.get(f"/books/q?{query_string}")
-    assert response.status_code == status_code.OK
+    assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == []
 
@@ -162,4 +161,4 @@ def test_return_bad_request_when_max_rating_is_less_than_or_equal_to_min_rating(
     query_string = _get_query_string(query_parameters)
 
     response = client.get(f"/books/q?{query_string}")
-    assert response.status_code == status_code.BAD_REQUEST
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
