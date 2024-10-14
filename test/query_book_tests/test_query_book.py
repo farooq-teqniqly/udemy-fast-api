@@ -36,6 +36,13 @@ def test_zero_not_a_valid_value_for_top():
     assert response.status_code == status_code.UNPROCESSABLE_ENTITY
 
 
+def test_query_can_return_no_results(mocker):
+    test_data.setup_mock_books(mocker)
+    response = client.get("/books/q?author=Bob")
+    assert response.status_code == status_code.OK
+    assert response.json() == []
+
+
 def _get_query_string(query_parameters: dict) -> str:
     query_string = ""
     possible_parameters = ["author", "category", "top", "isbn"]
