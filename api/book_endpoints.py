@@ -18,8 +18,7 @@ Functions:
 """
 
 import uvicorn
-from fastapi import Body, Depends, FastAPI, Path, Request
-from fastapi.responses import JSONResponse
+from fastapi import Body, Depends, FastAPI, Path
 
 import api.book_service as bs
 from api.models import (
@@ -31,14 +30,6 @@ from api.models import (
 )
 
 app = FastAPI(title="My Books API")
-
-
-@app.exception_handler(ValueError)
-async def validation_exception_handler(request: Request, exc: ValueError):
-    return JSONResponse(
-        status_code=400,
-        content={},
-    )
 
 
 @app.get("/books/q")
