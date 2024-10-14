@@ -7,19 +7,37 @@ import test_data
 import api.http_status_codes as status_code
 
 
-@pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
-def test_query_fails_when_isbn_invalid(isbn):
-    response = client.get(f"/books/q?isbn={isbn}")
-    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
+def _get_query_string(query_parameters: dict) -> str:
+    query_string = ""
+    possible_parameters = [
+        "author",
+        "category",
+        "top",
+        "isbn",
+        "min_rating",
+        "max_rating",
+    ]
+
+    for p in possible_parameters:
+        if p in query_parameters and query_parameters[p] is not None:
+            query_string += f"{p}={query_parameters[p]}&"
+
+    return query_string[:-1]
 
 
-def get_combinations(book_attribute_values: list) -> list:
+def _get_combinations(book_attribute_values: list) -> list:
     all_valid_values = []
 
     for i in range(len(book_attribute_values)):
         all_valid_values.append((book_attribute_values[i], None))
 
     return list(product(*all_valid_values))
+
+
+@pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
+def test_query_fails_when_isbn_invalid(isbn):
+    response = client.get(f"/books/q?isbn={isbn}")
+    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.parametrize(
@@ -31,7 +49,9 @@ def get_combinations(book_attribute_values: list) -> list:
         "min_rating",
         "max_rating",
     ),
-    get_combinations(["Stephen Hawking", "Science", 1, test_data.VALID_ISBN, 3.5, 4.5]),
+    _get_combinations(
+        ["Stephen Hawking", "Science", 1, test_data.VALID_ISBN, 3.5, 4.5]
+    ),
 )
 def test_query_combinations_that_return_results(
     mocker,
@@ -86,7 +106,7 @@ def test_zero_not_a_valid_value_for_top():
         "min_rating",
         "max_rating",
     ),
-    get_combinations(["John Doe", "Biography", "0000000000000", 1, 4]),
+    _get_combinations(["John Doe", "Biography", "0000000000000", 1, 4]),
 )
 def test_query_combinations_that_return_no_results(
     mocker, author: str, category: str, isbn: str, min_rating: float, max_rating: float
@@ -126,19 +146,20 @@ def test_query_combinations_that_return_no_results(
     assert response.json() == []
 
 
-def _get_query_string(query_parameters: dict) -> str:
-    query_string = ""
-    possible_parameters = [
-        "author",
-        "category",
-        "top",
-        "isbn",
-        "min_rating",
-        "max_rating",
-    ]
+@pytest.mark.parametrize(("min_rating", "max_rating"), [(5.0, 1.0), (3.0, 3.0)])
+def test_return_bad_request_when_max_rating_is_less_than_or_equal_to_min_rating(
+    min_rating: float, max_rating: float
+):
+    query_parameters = dict(
+        author="John Doe",
+        category="Cooking",
+        top=None,
+        isbn=test_data.VALID_ISBN,
+        min_rating=min_rating,
+        max_rating=max_rating,
+    )
 
-    for p in possible_parameters:
-        if p in query_parameters and query_parameters[p] is not None:
-            query_string += f"{p}={query_parameters[p]}&"
+    query_string = _get_query_string(query_parameters)
 
-    return query_string[:-1]
+    response = client.get(f"/books/q?{query_string}")
+    assert response.status_code == status_code.BAD_REQUEST

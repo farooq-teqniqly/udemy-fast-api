@@ -30,7 +30,13 @@ Classes:
 
 from typing import Optional
 
-from pydantic import BaseModel, Field, confloat
+from pydantic import (
+    BaseModel,
+    Field,
+    confloat,
+    model_validator,
+)
+from typing_extensions import Self
 
 VALID_ISBN_REGEX = r"^\d{13}$"
 
@@ -65,6 +71,14 @@ class BookQueryParameters(BaseModel):
     min_rating: Optional[float] = Field(None, ge=1.0, le=5.0)
     max_rating: Optional[float] = Field(None, ge=1.0, le=5.0)
     return_deleted_books: bool = False
+
+    @model_validator(mode="after")
+    def check_ratings(self) -> Self:
+        if self.min_rating is not None and self.max_rating is not None:
+            if self.max_rating <= self.min_rating:
+                msg = "max_rating must be greater than min_rating."
+                raise ValueError(msg)
+        return self
 
 
 class CreateBookRequest(BaseModel):

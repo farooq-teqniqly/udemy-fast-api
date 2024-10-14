@@ -8,7 +8,10 @@ Constants:
 - UNPROCESSABLE_ENTITY: Indicates that the server understands the content type of the
   request entity, and the syntax of the request entity is correct, but it was unable
   to process the contained instructions (422).
+- BAD_REQUEST: Indicates that the server cannot or will not process the request due to
+  something that is perceived to be a client error (400).
 """
 
 OK = 200
 UNPROCESSABLE_ENTITY = 422
+BAD_REQUEST = 400

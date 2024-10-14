@@ -142,15 +142,19 @@ async def query_book(params: BookQueryParameters) -> List[dict]:
     filtered_books = _filter_books(filtered_books, "category", params.category)
     filtered_books = _filter_books(filtered_books, "isbn", params.isbn)
 
-    if params.min_rating is None:
-        params.min_rating = 1.0
+    if params.min_rating is not None:
+        filtered_books = [
+            b
+            for b in filtered_books
+            if b["avg_rating"] is not None and b["avg_rating"] >= params.min_rating
+        ]
 
-    if params.max_rating is None:
-        params.max_rating = 5.0
-
-    filtered_books = [b for b in filtered_books if b["avg_rating"] >= params.min_rating]
-
-    filtered_books = [b for b in filtered_books if b["avg_rating"] <= params.max_rating]
+    if params.max_rating is not None:
+        filtered_books = [
+            b
+            for b in filtered_books
+            if b["avg_rating"] is not None and b["avg_rating"] <= params.max_rating
+        ]
 
     if not params.return_deleted_books:
         filtered_books = _exclude_deleted_books(filtered_books)
