@@ -42,6 +42,8 @@ from typing_extensions import Self
 import api.http_status_codes as status_code
 
 VALID_ISBN_REGEX = r"^\d{13}$"
+MIN_RATING = 1.0
+MAX_RATING = 5.0
 
 
 def _create_model_config(example: dict) -> dict:
@@ -71,8 +73,8 @@ class BookQueryParameters(BaseModel):
     category: Optional[str] = None
     top: Optional[int] = Field(None, ge=1)
     isbn: Optional[str] = Field(None, pattern=VALID_ISBN_REGEX)
-    min_rating: Optional[float] = Field(None, ge=1.0, le=5.0)
-    max_rating: Optional[float] = Field(None, ge=1.0, le=5.0)
+    min_rating: Optional[float] = Field(None, ge=MIN_RATING, le=MAX_RATING)
+    max_rating: Optional[float] = Field(None, ge=MIN_RATING, le=MAX_RATING)
     return_deleted_books: bool = False
 
     @model_validator(mode="after")
@@ -119,7 +121,7 @@ class AddRatingRequest(BaseModel):
         rating (float): The rating value, which must be between 1 and 5.
     """
 
-    rating: confloat(ge=1.0, le=5.0) = Field(
+    rating: confloat(ge=MIN_RATING, le=MAX_RATING) = Field(
         description="Rating must be between 1 and 5."
     )
 
