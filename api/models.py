@@ -52,7 +52,7 @@ class BookQueryParameters(BaseModel):
 
     author: Optional[str] = None
     category: Optional[str] = None
-    top: Optional[int] = None
+    top: Optional[int] = Field(None, ge=1)
     isbn: Optional[str] = Field(None, pattern=VALID_ISBN_REGEX)
     return_deleted_books: bool = False
 

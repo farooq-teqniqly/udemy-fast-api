@@ -7,14 +7,6 @@ import test_data
 import api.http_status_codes as status_code
 
 
-def test_can_query_by_isbn(mocker):
-    mock_books = test_data.setup_mock_books(mocker)
-    response = client.get(f"/books/q?isbn={test_data.VALID_ISBN}")
-    assert response.status_code == status_code.OK
-    books = list(response.json())
-    assert books[0] == mock_books[0]
-
-
 @pytest.mark.parametrize("isbn", test_data.INVALID_ISBNS)
 def test_query_fails_when_isbn_invalid(isbn):
     response = client.get(f"/books/q?isbn={isbn}")
@@ -37,6 +29,11 @@ def test_query_combinations(mocker, author: str, category: str, top: bool, isbn:
 
     books = list(response.json())
     assert books == mock_books
+
+
+def test_zero_not_a_valid_value_for_top():
+    response = client.get("/books/q?top=0")
+    assert response.status_code == status_code.UNPROCESSABLE_ENTITY
 
 
 def _get_query_string(query_parameters: dict) -> str:
