@@ -7,8 +7,6 @@ from starlette import status
 
 
 def test_create_book_is_successful(mocker):
-    mock_books = test_data.setup_mock_books(mocker, [])
-
     request = dict(
         title="The Great Gatsby",
         author="F. Scott Fitzgerald",
@@ -17,9 +15,9 @@ def test_create_book_is_successful(mocker):
     )
 
     response = client.post("/books", json=request)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_201_CREATED
 
-    created_book = mock_books[0]
+    created_book = response.json()
     assert created_book["title"] == request["title"]
     assert created_book["author"] == request["author"]
     assert created_book["isbn"] == request["isbn"]

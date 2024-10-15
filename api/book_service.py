@@ -164,7 +164,7 @@ async def query_book(params: BookQueryParameters) -> List[dict]:
     return filtered_books
 
 
-async def create_book(params: CreateBookRequest) -> None:
+async def create_book(params: CreateBookRequest) -> dict:
     """
     Adds a book to the BOOKS list.
 
@@ -172,17 +172,20 @@ async def create_book(params: CreateBookRequest) -> None:
         params: Contains the attributes of the book to add including title, author,
         category, and ISBN.
     """
-    BOOKS.append(
-        dict(
-            title=params.title,
-            author=params.author,
-            category=params.category,
-            isbn=params.isbn,
-            avg_rating=None,
-            num_ratings=None,
-            soft_deleted=False,
-        )
+
+    book = dict(
+        title=params.title,
+        author=params.author,
+        category=params.category,
+        isbn=params.isbn,
+        avg_rating=None,
+        num_ratings=None,
+        soft_deleted=False,
     )
+
+    BOOKS.append(book)
+
+    return book
 
 
 async def delete_book(isbn: str) -> None:

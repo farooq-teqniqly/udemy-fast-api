@@ -47,7 +47,7 @@ async def query_book(params: BookQueryParameters = Depends()):
     return await bs.query_book(params)
 
 
-@app.post("/books")
+@app.post("/books", status_code=status.HTTP_201_CREATED, response_model=dict)
 async def create_book(params: CreateBookRequest):
     """
     Endpoint to create a new book entry.
