@@ -18,7 +18,7 @@ Functions:
 """
 
 import uvicorn
-from fastapi import Body, Depends, FastAPI, Path
+from fastapi import Body, Depends, FastAPI, Path, Request
 from starlette import status
 
 import api.book_service as bs
@@ -48,19 +48,17 @@ async def query_book(params: BookQueryParameters = Depends()):
 
 
 @app.post("/books", status_code=status.HTTP_201_CREATED, response_model=dict)
-async def create_book(params: CreateBookRequest):
+async def create_book(request: Request, params: CreateBookRequest):
     """
-    Endpoint to create a new book entry.
-
     Args:
-        params:
-            CreateBookRequest: A request object containing details required to create a
-            book.
-
-    Returns:
-        A coroutine that resolves to the created book object
+        request: HTTP request object that provides request data and context.
+        params: CreateBookRequest object that contains the book details to create.
     """
-    return await bs.create_book(params)
+    book = await bs.create_book(params)
+    self = f"{request.url_for("query_book")}/q?isbn={params.isbn}"
+
+    book["links"] = dict(self=self)
+    return book
 
 
 @app.delete("/books/{isbn}")
