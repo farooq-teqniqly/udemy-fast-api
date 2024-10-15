@@ -33,6 +33,11 @@ from api.models import (
 app = FastAPI(title="My Books API")
 
 
+def _add_links(d: dict, self_link: str) -> dict:
+    d["links"] = dict(self=self_link)
+    return d
+
+
 @app.get("/books/q", status_code=status.HTTP_200_OK)
 async def query_book(params: BookQueryParameters = Depends()):
     """
@@ -57,7 +62,7 @@ async def create_book(request: Request, params: CreateBookRequest):
     book = await bs.create_book(params)
     self = f"{request.url_for("query_book")}?isbn={params.isbn}"
 
-    book["links"] = dict(self=self)
+    _add_links(book, self)
     return book
 
 
