@@ -25,7 +25,7 @@ def test_create_book_is_successful(mocker):
     assert created_book["avg_rating"] is None
     assert created_book["num_ratings"] is None
     assert created_book["soft_deleted"] is False
-    assert f"q?isbn={created_book["isbn"]}" in created_book["links"]["self"]
+    assert f"books/q?isbn={created_book["isbn"]}" in created_book["links"]["self"]
 
 
 @pytest.mark.parametrize(

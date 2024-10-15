@@ -55,7 +55,7 @@ async def create_book(request: Request, params: CreateBookRequest):
         params: CreateBookRequest object that contains the book details to create.
     """
     book = await bs.create_book(params)
-    self = f"{request.url_for("query_book")}/q?isbn={params.isbn}"
+    self = f"{request.url_for("query_book")}?isbn={params.isbn}"
 
     book["links"] = dict(self=self)
     return book
